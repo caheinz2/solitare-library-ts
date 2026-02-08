@@ -1,9 +1,10 @@
 /** @type {import('jest').Config} */
-module.exports = {
+const config = {
   preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
   extensionsToTreatAsEsm: ['.ts'],
-  testMatch: ['**/test/**/*.test.ts'],
+  testMatch: ['**/test/**/*.spec.ts'],
+  watchman: false,
   transform: {
     '^.+\\.ts$': [
       'ts-jest',
@@ -17,3 +18,5 @@ module.exports = {
     '^(\\.{1,2}/.*)\\.js$': '$1'
   }
 };
+
+export default config;
