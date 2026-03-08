@@ -1,9 +1,11 @@
 import type { Card } from './cards.js';
 
-export type Stock = ReadonlyArray<Card>;
-export type Waste = ReadonlyArray<Card>;
-export type Foundation = ReadonlyArray<Card>;
-export type TableauPile = ReadonlyArray<Card>;
+export type Stack<T> = ReadonlyArray<T>;
+
+export type Stock = Stack<Card>;
+export type Waste = Stack<Card>;
+export type Foundation = Stack<Card>;
+export type TableauPile = Stack<Card>;
 
 export type Foundations = readonly [Foundation, Foundation, Foundation, Foundation];
 export type Tableau = readonly [
