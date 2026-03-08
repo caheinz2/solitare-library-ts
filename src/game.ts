@@ -32,11 +32,11 @@ export class Game {
   }
 
   public get stock(): Stock {
-    return copyPile(this.gameState.stock) as Stock;
+    return copyPile(this.gameState.stock);
   }
 
   public get waste(): Waste {
-    return copyPile(this.gameState.waste) as Waste;
+    return copyPile(this.gameState.waste);
   }
 
   public get foundations(): Foundations {
