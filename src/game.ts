@@ -1,27 +1,10 @@
-import type { Card, Rank, Suit } from "./types/cards.js";
+import type { Card } from './types/cards.js';
 import type {
   FoundationIndex,
   GameState,
   TableauIndex,
-} from "./types/state.js";
-
-const SUITS: readonly Suit[] = ["clubs", "diamonds", "hearts", "spades"];
-const RANKS: readonly Rank[] = [
-  "A",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  "J",
-  "Q",
-  "K",
-];
-const TABLEAU_INDICES: readonly TableauIndex[] = [0, 1, 2, 3, 4, 5, 6];
+} from './types/state.js';
+import { RANKS, SUITS, TABLEAU_INDICES } from './game-constants.js';
 
 export type CreateGameOptions = Readonly<{
   rng?: () => number;
@@ -45,22 +28,22 @@ export class Game {
 
   // Draws 3 cards from stock to waste.
   public draw(): Game {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   // Moves the top waste card to a tableau pile.
   public moveWasteToTableau(_tableauIndex: TableauIndex): Game {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   // Moves the top waste card to a foundation pile.
   public moveWasteToFoundation(_foundationIndex: FoundationIndex): Game {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   // Moves the top card from one tableau pile to another.
   public moveTableauToTableau(_from: TableauIndex, _to: TableauIndex): Game {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   // Moves the top card from a tableau pile to a foundation pile.
@@ -68,7 +51,7 @@ export class Game {
     _tableauIndex: TableauIndex,
     _foundationIndex: FoundationIndex,
   ): Game {
-    throw new Error("Not implemented");
+    throw new Error('Not implemented');
   }
 
   private static createOrderedDeck(): ReadonlyArray<Card> {
@@ -117,7 +100,7 @@ export class Game {
         const nextCard = workingDeck.pop();
 
         if (!nextCard) {
-          throw new Error("Cannot initialize game with an incomplete deck");
+          throw new Error('Cannot initialize game with an incomplete deck');
         }
 
         pile.push({
