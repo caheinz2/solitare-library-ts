@@ -22,6 +22,15 @@ export class Game {
     this.gameState = state;
   }
 
+  public static create(options: CreateGameOptions = {}): Game {
+    const rng = options.rng ?? Math.random;
+    const orderedDeck = createOrderedDeck();
+    const shuffledDeck = shuffleDeck(orderedDeck, rng);
+    const initialState = Game.dealInitialState(shuffledDeck);
+
+    return new Game(initialState);
+  }
+
   public get stock(): Stock {
     return this.gameState.stock;
   }
@@ -49,15 +58,6 @@ export class Game {
       null,
       2,
     );
-  }
-
-  public static create(options: CreateGameOptions = {}): Game {
-    const rng = options.rng ?? Math.random;
-    const orderedDeck = createOrderedDeck();
-    const shuffledDeck = shuffleDeck(orderedDeck, rng);
-    const initialState = Game.dealInitialState(shuffledDeck);
-
-    return new Game(initialState);
   }
 
   // Draws 3 cards from stock to waste.
