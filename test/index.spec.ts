@@ -16,32 +16,39 @@ const createSequenceRng = (values: ReadonlyArray<number>): (() => number) => {
   };
 };
 
-const getAllCards = (state: GameState): ReadonlyArray<Card> => [
-  ...state.stock,
-  ...state.waste,
-  ...state.foundations[0],
-  ...state.foundations[1],
-  ...state.foundations[2],
-  ...state.foundations[3],
-  ...state.tableau[0],
-  ...state.tableau[1],
-  ...state.tableau[2],
-  ...state.tableau[3],
-  ...state.tableau[4],
-  ...state.tableau[5],
-  ...state.tableau[6],
+const getStateSnapshot = (game: Game): GameState => ({
+  stock: game.stock,
+  waste: game.waste,
+  foundations: game.foundations,
+  tableau: game.tableau,
+});
+
+const getAllCards = (game: Game): ReadonlyArray<Card> => [
+  ...game.stock,
+  ...game.waste,
+  ...game.foundations[0],
+  ...game.foundations[1],
+  ...game.foundations[2],
+  ...game.foundations[3],
+  ...game.tableau[0],
+  ...game.tableau[1],
+  ...game.tableau[2],
+  ...game.tableau[3],
+  ...game.tableau[4],
+  ...game.tableau[5],
+  ...game.tableau[6],
 ];
 
 describe("Game.create", () => {
   it("initializes tableau, stock, waste, and foundations with correct sizes", () => {
     const game = Game.create({ rng: () => 0.5 });
-    const tableauSizes = game.state.tableau.map((pile) => pile.length);
+    const tableauSizes = game.tableau.map((pile) => pile.length);
 
     expect(tableauSizes).toEqual([1, 2, 3, 4, 5, 6, 7]);
-    expect(game.state.stock).toHaveLength(24);
-    expect(game.state.waste).toHaveLength(0);
-    expect(game.state.foundations).toHaveLength(4);
-    game.state.foundations.forEach((foundationPile) => {
+    expect(game.stock).toHaveLength(24);
+    expect(game.waste).toHaveLength(0);
+    expect(game.foundations).toHaveLength(4);
+    game.foundations.forEach((foundationPile) => {
       expect(foundationPile).toHaveLength(0);
     });
   });
@@ -49,7 +56,7 @@ describe("Game.create", () => {
   it("sets only the top tableau card face up for each pile", () => {
     const game = Game.create({ rng: () => 0.5 });
 
-    game.state.tableau.forEach((pile) => {
+    game.tableau.forEach((pile) => {
       pile.forEach((card, cardIndex) => {
         expect(card.faceUp).toBe(cardIndex === pile.length - 1);
       });
@@ -59,14 +66,14 @@ describe("Game.create", () => {
   it("keeps all stock cards face down", () => {
     const game = Game.create({ rng: () => 0.5 });
 
-    game.state.stock.forEach((card) => {
+    game.stock.forEach((card) => {
       expect(card.faceUp).toBe(false);
     });
   });
 
   it("conserves all 52 unique cards across all piles", () => {
     const game = Game.create({ rng: () => 0.5 });
-    const allCards = getAllCards(game.state);
+    const allCards = getAllCards(game);
     const uniqueCardKeys = new Set(
       allCards.map((card) => `${card.suit}-${card.rank}`),
     );
@@ -80,14 +87,14 @@ describe("Game.create", () => {
     const gameA = Game.create({ rng: createSequenceRng(rngValues) });
     const gameB = Game.create({ rng: createSequenceRng(rngValues) });
 
-    expect(gameA.state).toEqual(gameB.state);
+    expect(getStateSnapshot(gameA)).toEqual(getStateSnapshot(gameB));
   });
 
   it("produces different initial states for different rng sequences", () => {
     const gameA = Game.create({ rng: () => 0 });
     const gameB = Game.create({ rng: () => 0.999999999 });
 
-    expect(gameA.state).not.toEqual(gameB.state);
+    expect(getStateSnapshot(gameA)).not.toEqual(getStateSnapshot(gameB));
   });
 });
 

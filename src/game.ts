@@ -1,8 +1,12 @@
 import type { Card } from './types/cards.js';
 import type {
   FoundationIndex,
+  Foundations,
   GameState,
+  Stock,
   TableauIndex,
+  Tableau,
+  Waste,
 } from './types/state.js';
 import { createOrderedDeck, shuffleDeck } from './deck.js';
 import { TABLEAU_INDICES } from './game-constants.js';
@@ -12,10 +16,26 @@ export type CreateGameOptions = Readonly<{
 }>;
 
 export class Game {
-  public readonly state: GameState;
+  private readonly gameState: GameState;
 
   private constructor(state: GameState) {
-    this.state = state;
+    this.gameState = state;
+  }
+
+  public get stock(): Stock {
+    return this.gameState.stock;
+  }
+
+  public get waste(): Waste {
+    return this.gameState.waste;
+  }
+
+  public get foundations(): Foundations {
+    return this.gameState.foundations;
+  }
+
+  public get tableau(): Tableau {
+    return this.gameState.tableau;
   }
 
   public static create(options: CreateGameOptions = {}): Game {
