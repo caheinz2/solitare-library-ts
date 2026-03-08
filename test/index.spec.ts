@@ -109,3 +109,13 @@ describe("Game actions", () => {
     expect(() => game.moveTableauToFoundation(0, 0)).toThrow("Not implemented");
   });
 });
+
+describe("Game debug helpers", () => {
+  it("returns the full game state as formatted JSON", () => {
+    const game = Game.create({ rng: () => 0.5 });
+    const debugOutput = game.debugString();
+    const parsedState = JSON.parse(debugOutput) as GameState;
+
+    expect(parsedState).toEqual(getStateSnapshot(game));
+  });
+});

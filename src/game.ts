@@ -38,6 +38,19 @@ export class Game {
     return this.gameState.tableau;
   }
 
+  public debugString(): string {
+    return JSON.stringify(
+      {
+        stock: this.stock,
+        waste: this.waste,
+        foundations: this.foundations,
+        tableau: this.tableau,
+      },
+      null,
+      2,
+    );
+  }
+
   public static create(options: CreateGameOptions = {}): Game {
     const rng = options.rng ?? Math.random;
     const orderedDeck = createOrderedDeck();
