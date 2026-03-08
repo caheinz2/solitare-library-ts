@@ -1,4 +1,3 @@
-import type { Card } from "./types/cards.js";
 import type {
   FoundationIndex,
   Foundations,
@@ -9,7 +8,8 @@ import type {
   Waste,
 } from "./types/state.js";
 import { createOrderedDeck, shuffleDeck } from "./deck.js";
-import { TABLEAU_INDICES } from "./game-constants.js";
+import { copyPile } from "./state-copy.js";
+import { dealInitialState } from "./state-ops.js";
 
 export type CreateGameOptions = Readonly<{
   rng?: () => number;
@@ -26,27 +26,27 @@ export class Game {
     const rng = options.rng ?? Math.random;
     const orderedDeck = createOrderedDeck();
     const shuffledDeck = shuffleDeck(orderedDeck, rng);
-    const initialState = Game.dealInitialState(shuffledDeck);
+    const initialState = dealInitialState(shuffledDeck);
 
     return new Game(initialState);
   }
 
   public get stock(): Stock {
-    return Game.clonePile(this.gameState.stock);
+    return copyPile(this.gameState.stock) as Stock;
   }
 
   public get waste(): Waste {
-    return Game.clonePile(this.gameState.waste);
+    return copyPile(this.gameState.waste) as Waste;
   }
 
   public get foundations(): Foundations {
     const [first, second, third, fourth] = this.gameState.foundations;
 
     return [
-      Game.clonePile(first),
-      Game.clonePile(second),
-      Game.clonePile(third),
-      Game.clonePile(fourth),
+      copyPile(first),
+      copyPile(second),
+      copyPile(third),
+      copyPile(fourth),
     ];
   }
 
@@ -55,13 +55,13 @@ export class Game {
       this.gameState.tableau;
 
     return [
-      Game.clonePile(first),
-      Game.clonePile(second),
-      Game.clonePile(third),
-      Game.clonePile(fourth),
-      Game.clonePile(fifth),
-      Game.clonePile(sixth),
-      Game.clonePile(seventh),
+      copyPile(first),
+      copyPile(second),
+      copyPile(third),
+      copyPile(fourth),
+      copyPile(fifth),
+      copyPile(sixth),
+      copyPile(seventh),
     ];
   }
 
@@ -104,49 +104,5 @@ export class Game {
     _foundationIndex: FoundationIndex,
   ): Game {
     throw new Error("Not implemented");
-  }
-
-  private static clonePile(pile: ReadonlyArray<Card>): ReadonlyArray<Card> {
-    return pile.map((card) => ({ ...card }));
-  }
-
-  private static dealInitialState(deck: ReadonlyArray<Card>): GameState {
-    const workingDeck = [...deck];
-    const tableau: [Card[], Card[], Card[], Card[], Card[], Card[], Card[]] = [
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-    ];
-
-    for (const tableauIndex of TABLEAU_INDICES) {
-      const pileSize = tableauIndex + 1;
-      const pile = tableau[tableauIndex];
-
-      for (let cardIndex = 0; cardIndex < pileSize; cardIndex += 1) {
-        const nextCard = workingDeck.pop();
-
-        if (!nextCard) {
-          throw new Error("Cannot initialize game with an incomplete deck");
-        }
-
-        pile.push({
-          ...nextCard,
-          faceUp: cardIndex === pileSize - 1,
-        });
-      }
-    }
-
-    const stock = workingDeck.map((card) => ({ ...card, faceUp: false }));
-
-    return {
-      stock,
-      waste: [],
-      foundations: [[], [], [], []],
-      tableau,
-    };
   }
 }
