@@ -4,7 +4,8 @@ import type {
   GameState,
   TableauIndex,
 } from './types/state.js';
-import { RANKS, SUITS, TABLEAU_INDICES } from './game-constants.js';
+import { createOrderedDeck, shuffleDeck } from './deck.js';
+import { TABLEAU_INDICES } from './game-constants.js';
 
 export type CreateGameOptions = Readonly<{
   rng?: () => number;
@@ -19,8 +20,8 @@ export class Game {
 
   public static create(options: CreateGameOptions = {}): Game {
     const rng = options.rng ?? Math.random;
-    const orderedDeck = Game.createOrderedDeck();
-    const shuffledDeck = Game.shuffleDeck(orderedDeck, rng);
+    const orderedDeck = createOrderedDeck();
+    const shuffledDeck = shuffleDeck(orderedDeck, rng);
     const initialState = Game.dealInitialState(shuffledDeck);
 
     return new Game(initialState);
@@ -52,32 +53,6 @@ export class Game {
     _foundationIndex: FoundationIndex,
   ): Game {
     throw new Error('Not implemented');
-  }
-
-  private static createOrderedDeck(): ReadonlyArray<Card> {
-    const deck: Card[] = [];
-
-    for (const suit of SUITS) {
-      for (const rank of RANKS) {
-        deck.push({ suit, rank, faceUp: false });
-      }
-    }
-
-    return deck;
-  }
-
-  private static shuffleDeck(
-    deck: ReadonlyArray<Card>,
-    rng: () => number,
-  ): ReadonlyArray<Card> {
-    const shuffled = [...deck];
-
-    for (let i = shuffled.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(rng() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j]!, shuffled[i]!];
-    }
-
-    return shuffled;
   }
 
   private static dealInitialState(deck: ReadonlyArray<Card>): GameState {
