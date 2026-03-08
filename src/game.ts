@@ -1,4 +1,4 @@
-import type { Card } from './types/cards.js';
+import type { Card } from "./types/cards.js";
 import type {
   FoundationIndex,
   Foundations,
@@ -7,9 +7,9 @@ import type {
   TableauIndex,
   Tableau,
   Waste,
-} from './types/state.js';
-import { createOrderedDeck, shuffleDeck } from './deck.js';
-import { TABLEAU_INDICES } from './game-constants.js';
+} from "./types/state.js";
+import { createOrderedDeck, shuffleDeck } from "./deck.js";
+import { TABLEAU_INDICES } from "./game-constants.js";
 
 export type CreateGameOptions = Readonly<{
   rng?: () => number;
@@ -32,19 +32,37 @@ export class Game {
   }
 
   public get stock(): Stock {
-    return this.gameState.stock;
+    return Game.clonePile(this.gameState.stock);
   }
 
   public get waste(): Waste {
-    return this.gameState.waste;
+    return Game.clonePile(this.gameState.waste);
   }
 
   public get foundations(): Foundations {
-    return this.gameState.foundations;
+    const [first, second, third, fourth] = this.gameState.foundations;
+
+    return [
+      Game.clonePile(first),
+      Game.clonePile(second),
+      Game.clonePile(third),
+      Game.clonePile(fourth),
+    ];
   }
 
   public get tableau(): Tableau {
-    return this.gameState.tableau;
+    const [first, second, third, fourth, fifth, sixth, seventh] =
+      this.gameState.tableau;
+
+    return [
+      Game.clonePile(first),
+      Game.clonePile(second),
+      Game.clonePile(third),
+      Game.clonePile(fourth),
+      Game.clonePile(fifth),
+      Game.clonePile(sixth),
+      Game.clonePile(seventh),
+    ];
   }
 
   public debugString(): string {
@@ -62,22 +80,22 @@ export class Game {
 
   // Draws 3 cards from stock to waste.
   public draw(): Game {
-    throw new Error('Not implemented');
+    throw new Error("Not implemented");
   }
 
   // Moves the top waste card to a tableau pile.
   public moveWasteToTableau(_tableauIndex: TableauIndex): Game {
-    throw new Error('Not implemented');
+    throw new Error("Not implemented");
   }
 
   // Moves the top waste card to a foundation pile.
   public moveWasteToFoundation(_foundationIndex: FoundationIndex): Game {
-    throw new Error('Not implemented');
+    throw new Error("Not implemented");
   }
 
   // Moves the top card from one tableau pile to another.
   public moveTableauToTableau(_from: TableauIndex, _to: TableauIndex): Game {
-    throw new Error('Not implemented');
+    throw new Error("Not implemented");
   }
 
   // Moves the top card from a tableau pile to a foundation pile.
@@ -85,7 +103,11 @@ export class Game {
     _tableauIndex: TableauIndex,
     _foundationIndex: FoundationIndex,
   ): Game {
-    throw new Error('Not implemented');
+    throw new Error("Not implemented");
+  }
+
+  private static clonePile(pile: ReadonlyArray<Card>): ReadonlyArray<Card> {
+    return pile.map((card) => ({ ...card }));
   }
 
   private static dealInitialState(deck: ReadonlyArray<Card>): GameState {
@@ -108,7 +130,7 @@ export class Game {
         const nextCard = workingDeck.pop();
 
         if (!nextCard) {
-          throw new Error('Cannot initialize game with an incomplete deck');
+          throw new Error("Cannot initialize game with an incomplete deck");
         }
 
         pile.push({

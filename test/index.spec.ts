@@ -98,6 +98,41 @@ describe("Game.create", () => {
   });
 });
 
+describe("Game immutability", () => {
+  it("returns defensive copies from getters", () => {
+    const game = Game.create({ rng: () => 0.5 });
+    const stockView = game.stock as unknown as Card[];
+    const tableauView = game.tableau;
+    const firstTableauCard = tableauView[0][0];
+
+    if (!firstTableauCard) {
+      throw new Error("Expected at least one card in tableau pile 0");
+    }
+
+    const mutableCard = firstTableauCard as unknown as { faceUp: boolean };
+    const beforeState = getStateSnapshot(game);
+
+    expect(() => {
+      stockView.push({ suit: "clubs", rank: "A", faceUp: false });
+      mutableCard.faceUp = false;
+    }).not.toThrow();
+
+    const afterState = getStateSnapshot(game);
+    const freshStock = game.stock;
+    const freshTopTableauCard = game.tableau[0][0];
+
+    if (!freshTopTableauCard) {
+      throw new Error("Expected at least one card in tableau pile 0");
+    }
+
+    expect(stockView).not.toBe(freshStock);
+    expect(stockView).toHaveLength(25);
+    expect(freshStock).toHaveLength(24);
+    expect(freshTopTableauCard.faceUp).toBe(true);
+    expect(afterState).toEqual(beforeState);
+  });
+});
+
 describe("Game actions", () => {
   it("throws Not implemented for action methods in this branch", () => {
     const game = Game.create({ rng: () => 0.5 });
