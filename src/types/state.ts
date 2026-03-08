@@ -19,9 +19,9 @@ export type Tableau = readonly [
 export type FoundationIndex = 0 | 1 | 2 | 3;
 export type TableauIndex = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-export interface GameState {
+export type GameState = {
   readonly stock: Stock;
   readonly waste: Waste;
   readonly foundations: Foundations;
   readonly tableau: Tableau;
-}
+};

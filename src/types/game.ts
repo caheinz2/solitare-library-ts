@@ -1,8 +1,7 @@
-import type { FoundationIndex, Foundations, GameState, TableauIndex } from './state.js';
+import type { FoundationIndex, GameState, TableauIndex } from './state.js';
 
 export type Game = {
-  state: GameState;
-  a: Foundations
+  readonly state: GameState;
 
   // Draws 3 cards from stock to waste.
   draw(): Game;
