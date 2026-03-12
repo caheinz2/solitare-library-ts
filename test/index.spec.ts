@@ -39,6 +39,16 @@ const getAllCards = (game: Game): ReadonlyArray<Card> => [
   ...game.tableau[6],
 ];
 
+const getCardKey = (card: Card): string => `${card.suit}-${card.rank}`;
+
+const expectConservedUniqueDeck = (game: Game): void => {
+  const allCards = getAllCards(game);
+  const uniqueCardKeys = new Set(allCards.map(getCardKey));
+
+  expect(allCards).toHaveLength(52);
+  expect(uniqueCardKeys.size).toBe(52);
+};
+
 describe("Game.create", () => {
   it("initializes tableau, stock, waste, and foundations with correct sizes", () => {
     const game = Game.create({ rng: () => 0.5 });
@@ -73,13 +83,8 @@ describe("Game.create", () => {
 
   it("conserves all 52 unique cards across all piles", () => {
     const game = Game.create({ rng: () => 0.5 });
-    const allCards = getAllCards(game);
-    const uniqueCardKeys = new Set(
-      allCards.map((card) => `${card.suit}-${card.rank}`),
-    );
 
-    expect(allCards).toHaveLength(52);
-    expect(uniqueCardKeys.size).toBe(52);
+    expectConservedUniqueDeck(game);
   });
 
   it("is deterministic with the same rng sequence", () => {
@@ -134,10 +139,81 @@ describe("Game immutability", () => {
 });
 
 describe("Game actions", () => {
-  it("throws Not implemented for action methods in this branch", () => {
+  it("draws 3 cards from stock to waste and flips drawn cards face up", () => {
     const game = Game.create({ rng: () => 0.5 });
 
-    expect(() => game.draw()).toThrow("Not implemented");
+    const nextGame = game.draw();
+
+    expect(nextGame.stock).toHaveLength(21);
+    expect(nextGame.waste).toHaveLength(3);
+    nextGame.waste.forEach((card) => {
+      expect(card.faceUp).toBe(true);
+    });
+  });
+
+  it("moves all stock cards to waste after 8 draws", () => {
+    let game = Game.create({ rng: () => 0.5 });
+
+    for (let drawIndex = 0; drawIndex < 8; drawIndex += 1) {
+      game = game.draw();
+    }
+
+    expect(game.stock).toHaveLength(0);
+    expect(game.waste).toHaveLength(24);
+  });
+
+  it("recycles waste into stock and draws in the same call", () => {
+    let game = Game.create({ rng: () => 0.5 });
+
+    for (let drawIndex = 0; drawIndex < 8; drawIndex += 1) {
+      game = game.draw();
+    }
+
+    const wasteBeforeRecycle = game.waste;
+    const expectedWasteKeys = wasteBeforeRecycle.slice(0, 3).map(getCardKey);
+
+    const recycledGame = game.draw();
+    const recycledWasteKeys = recycledGame.waste.map(getCardKey);
+
+    expect(recycledGame.stock).toHaveLength(21);
+    expect(recycledGame.waste).toHaveLength(3);
+    expect(recycledWasteKeys).toEqual(expectedWasteKeys);
+    recycledGame.waste.forEach((card) => {
+      expect(card.faceUp).toBe(true);
+    });
+    recycledGame.stock.forEach((card) => {
+      expect(card.faceUp).toBe(false);
+    });
+  });
+
+  it("is a no-op by value when both stock and waste are empty", () => {
+    const GameConstructor = Game as unknown as { new (state: GameState): Game };
+    const emptyGame = new GameConstructor({
+      stock: [],
+      waste: [],
+      foundations: [[], [], [], []],
+      tableau: [[], [], [], [], [], [], []],
+    });
+
+    const nextGame = emptyGame.draw();
+
+    expect(nextGame).toBe(emptyGame);
+    expect(getStateSnapshot(nextGame)).toEqual(getStateSnapshot(emptyGame));
+  });
+
+  it("mutates current game state when drawing", () => {
+    const game = Game.create({ rng: () => 0.5 });
+    const beforeState = getStateSnapshot(game);
+
+    const nextGame = game.draw();
+
+    expect(nextGame).toBe(game);
+    expect(getStateSnapshot(nextGame)).not.toEqual(beforeState);
+  });
+
+  it("throws Not implemented for move action methods in this branch", () => {
+    const game = Game.create({ rng: () => 0.5 });
+
     expect(() => game.moveWasteToTableau(0)).toThrow("Not implemented");
     expect(() => game.moveWasteToFoundation(0)).toThrow("Not implemented");
     expect(() => game.moveTableauToTableau(0, 1)).toThrow("Not implemented");

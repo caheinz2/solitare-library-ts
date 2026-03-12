@@ -9,14 +9,14 @@ import type {
 } from "./types/state.js";
 import { createOrderedDeck, shuffleDeck } from "./deck.js";
 import { copyPile } from "./state-copy.js";
-import { dealInitialState } from "./state-ops.js";
+import { dealInitialState, drawCards } from "./state-ops.js";
 
 export type CreateGameOptions = Readonly<{
   rng?: () => number;
 }>;
 
 export class Game {
-  private readonly gameState: GameState;
+  private gameState: GameState;
 
   private constructor(state: GameState) {
     this.gameState = state;
@@ -80,7 +80,8 @@ export class Game {
 
   // Draws 3 cards from stock to waste.
   public draw(): Game {
-    throw new Error("Not implemented");
+    this.gameState = drawCards(this.gameState);
+    return this;
   }
 
   // Moves the top waste card to a tableau pile.
