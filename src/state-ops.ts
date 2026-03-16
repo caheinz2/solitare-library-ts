@@ -4,14 +4,30 @@ import type {
   FoundationIndex,
   Foundations,
   GameState,
+  Stack,
   Tableau,
 } from "./types/state.js";
-import { DRAW_COUNT, RANKS, TABLEAU_INDICES } from "./game-constants.js";
+import { canMoveCardToFoundation } from "./card-ops.js";
+import { DRAW_COUNT, TABLEAU_INDICES } from "./game-constants.js";
 
 type MoveHandler<TArgs extends ReadonlyArray<unknown> = []> = (
   state: GameState,
   ...args: TArgs
 ) => GameState;
+
+const peekTopCard = <T>(pile: Stack<T>): T | undefined => pile[pile.length - 1];
+
+const removeCardFromTop = <T>(pile: Stack<T>): T | undefined => pile.pop();
+
+const addCardToTop = <T>(pile: Stack<T>, card: T): void => {
+  pile.push(card);
+};
+
+const addCardToFoundation = (foundation: Foundation, card: Card): void => {
+  card.faceUp = true;
+  foundation.suit ??= card.suit;
+  addCardToTop(foundation.cards, card);
+};
 
 export const dealInitialState = (deck: ReadonlyArray<Card>): GameState => {
   const workingDeck = [...deck];
@@ -58,14 +74,14 @@ const drawFromStock = (state: GameState): GameState => {
   const cardsToDraw = Math.min(DRAW_COUNT, state.stock.length);
 
   for (let drawIndex = 0; drawIndex < cardsToDraw; drawIndex += 1) {
-    const drawnCard = state.stock.pop();
+    const drawnCard = removeCardFromTop(state.stock);
 
     if (!drawnCard) {
       break;
     }
 
     drawnCard.faceUp = true;
-    state.waste.push(drawnCard);
+    addCardToTop(state.waste, drawnCard);
   }
 
   return state;
@@ -73,14 +89,14 @@ const drawFromStock = (state: GameState): GameState => {
 
 const moveWasteBackToStock = (state: GameState): GameState => {
   while (state.waste.length > 0) {
-    const card = state.waste.pop();
+    const card = removeCardFromTop(state.waste);
 
     if (!card) {
       break;
     }
 
     card.faceUp = false;
-    state.stock.push(card);
+    addCardToTop(state.stock, card);
   }
 
   return state;
@@ -109,36 +125,20 @@ export const moveWasteCardToFoundation: MoveHandler<[FoundationIndex]> = (
   state,
   foundationIndex,
 ): GameState => {
-  const cardToMove = state.waste[state.waste.length - 1];
+  const cardToMove = peekTopCard(state.waste);
 
   if (!cardToMove) {
     return state;
   }
 
   const targetFoundation = state.foundations[foundationIndex];
-  const topFoundationCard =
-    targetFoundation.cards[targetFoundation.cards.length - 1];
 
-  if (!topFoundationCard && cardToMove.rank !== "A") {
+  if (!canMoveCardToFoundation(cardToMove, targetFoundation)) {
     return state;
   }
 
-  if (topFoundationCard) {
-    const cardRankIndex = RANKS.indexOf(cardToMove.rank);
-    const topRankIndex = RANKS.indexOf(topFoundationCard.rank);
-
-    if (
-      targetFoundation.suit !== cardToMove.suit ||
-      cardRankIndex !== topRankIndex + 1
-    ) {
-      return state;
-    }
-  }
-
-  state.waste.pop();
-  cardToMove.faceUp = true;
-  targetFoundation.suit ??= cardToMove.suit;
-  targetFoundation.cards.push(cardToMove);
+  removeCardFromTop(state.waste);
+  addCardToFoundation(targetFoundation, cardToMove);
 
   return state;
 };
