@@ -10,5 +10,15 @@ export const addCardToTop = <T>(stack: Stack<T>, card: T): void => {
   stack.push(card);
 };
 
+export const flipTopCardFaceUp = (stack: Stack<Card>): void => {
+  const topCard = peekTopCard(stack);
+
+  if (!topCard) {
+    return;
+  }
+
+  topCard.faceUp = true;
+};
+
 export const copyStack = (stack: Stack<Card>): Stack<Card> =>
   stack.map((card) => ({ ...card }));

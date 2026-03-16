@@ -10,6 +10,7 @@ import type {
 import { createOrderedDeck, shuffleDeck } from "./deck.js";
 import { dealInitialState } from "./moves/deal-initial-state.js";
 import { drawCards } from "./moves/draw-cards.js";
+import { moveTableauCardToFoundation } from "./moves/move-tableau-to-foundation.js";
 import { moveWasteCardToFoundation } from "./moves/move-waste-to-foundation.js";
 import { copyFoundation } from "./utils/foundation-ops.js";
 import { copyStack } from "./utils/stack-ops.js";
@@ -105,9 +106,14 @@ export class Game {
 
   // Moves the top card from a tableau pile to a foundation pile.
   public moveTableauToFoundation(
-    _tableauIndex: TableauIndex,
-    _foundationIndex: FoundationIndex,
+    tableauIndex: TableauIndex,
+    foundationIndex: FoundationIndex,
   ): Game {
-    throw new Error("Not implemented");
+    this.gameState = moveTableauCardToFoundation(
+      this.gameState,
+      tableauIndex,
+      foundationIndex,
+    );
+    return this;
   }
 }
