@@ -8,12 +8,11 @@ import type {
   Waste,
 } from "./types/state.js";
 import { createOrderedDeck, shuffleDeck } from "./deck.js";
-import { copyFoundation, copyPile } from "./state-copy.js";
-import {
-  dealInitialState,
-  drawCards,
-  moveWasteCardToFoundation,
-} from "./state-ops.js";
+import { dealInitialState } from "./moves/deal-initial-state.js";
+import { drawCards } from "./moves/draw-cards.js";
+import { moveWasteCardToFoundation } from "./moves/move-waste-to-foundation.js";
+import { copyFoundation } from "./utils/foundation-ops.js";
+import { copyStack } from "./utils/stack-ops.js";
 
 export type CreateGameOptions = Readonly<{
   rng?: () => number;
@@ -36,11 +35,11 @@ export class Game {
   }
 
   public get stock(): Stock {
-    return copyPile(this.gameState.stock);
+    return copyStack(this.gameState.stock);
   }
 
   public get waste(): Waste {
-    return copyPile(this.gameState.waste);
+    return copyStack(this.gameState.waste);
   }
 
   public get foundations(): Foundations {
@@ -59,13 +58,13 @@ export class Game {
       this.gameState.tableau;
 
     return [
-      copyPile(first),
-      copyPile(second),
-      copyPile(third),
-      copyPile(fourth),
-      copyPile(fifth),
-      copyPile(sixth),
-      copyPile(seventh),
+      copyStack(first),
+      copyStack(second),
+      copyStack(third),
+      copyStack(fourth),
+      copyStack(fifth),
+      copyStack(sixth),
+      copyStack(seventh),
     ];
   }
 
