@@ -2,7 +2,9 @@ import type { Card } from "./types/cards.js";
 import type {
   Foundation,
   FoundationIndex,
+  Foundations,
   GameState,
+  Tableau,
 } from "./types/state.js";
 import { DRAW_COUNT, RANKS, TABLEAU_INDICES } from "./game-constants.js";
 
@@ -11,22 +13,9 @@ type MoveHandler<TArgs extends ReadonlyArray<unknown> = []> = (
   ...args: TArgs
 ) => GameState;
 
-const createEmptyFoundation = (): Foundation => ({
-  suit: null,
-  cards: [],
-});
-
 export const dealInitialState = (deck: ReadonlyArray<Card>): GameState => {
   const workingDeck = [...deck];
-  const tableau: [Card[], Card[], Card[], Card[], Card[], Card[], Card[]] = [
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-    [],
-  ];
+  const tableau: Tableau = [[], [], [], [], [], [], []];
 
   for (const tableauIndex of TABLEAU_INDICES) {
     const pileSize = tableauIndex + 1;
@@ -48,20 +37,22 @@ export const dealInitialState = (deck: ReadonlyArray<Card>): GameState => {
 
   const stock = workingDeck.map((card) => ({ ...card, faceUp: false }));
 
+  const foundations: Foundations = [
+    { suit: null, cards: [] },
+    { suit: null, cards: [] },
+    { suit: null, cards: [] },
+    { suit: null, cards: [] },
+  ];
+
   return {
     stock,
     waste: [],
-    foundations: [
-      createEmptyFoundation(),
-      createEmptyFoundation(),
-      createEmptyFoundation(),
-      createEmptyFoundation(),
-    ],
+    foundations,
     tableau,
   };
 };
 
-const drawFromStock = (state: GameState): void => {
+const drawFromStock = (state: GameState): GameState => {
   const cardsToDraw = Math.min(DRAW_COUNT, state.stock.length);
 
   for (let drawIndex = 0; drawIndex < cardsToDraw; drawIndex += 1) {
@@ -76,6 +67,8 @@ const drawFromStock = (state: GameState): void => {
       faceUp: true,
     });
   }
+
+  return state;
 };
 
 const moveWasteBackToStock = (state: GameState): GameState => {
@@ -98,14 +91,14 @@ const moveWasteBackToStock = (state: GameState): GameState => {
 const isStockAndWasteEmpty = (state: GameState): boolean =>
   state.stock.length === 0 && state.waste.length === 0;
 
-const hasCardsInStock = (state: GameState): boolean => state.stock.length > 0;
+const isStockEmpty = (state: GameState): boolean => state.stock.length === 0;
 
 export const drawCards = (state: GameState): GameState => {
   if (isStockAndWasteEmpty(state)) {
     return state;
   }
 
-  if (!hasCardsInStock(state)) {
+  if (isStockEmpty(state)) {
     moveWasteBackToStock(state);
   }
 

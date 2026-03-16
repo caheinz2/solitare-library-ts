@@ -146,7 +146,7 @@ describe("Game.create", () => {
 describe("Game immutability", () => {
   it("returns defensive copies from stock and tableau getters", () => {
     const game = Game.create({ rng: () => 0.5 });
-    const stockView = game.stock as unknown as Card[];
+    const stockView = game.stock;
     const tableauView = game.tableau;
     const firstTableauCard = tableauView[0][0];
 
@@ -177,10 +177,7 @@ describe("Game immutability", () => {
 
   it("returns defensive copies from foundation getters", () => {
     const game = Game.create({ rng: () => 0.5 });
-    const foundationView = game.foundations as unknown as Array<{
-      suit: Suit | null;
-      cards: Card[];
-    }>;
+    const foundationView = game.foundations;
     const firstFoundation = foundationView[0];
     const beforeState = getStateSnapshot(game);
 
