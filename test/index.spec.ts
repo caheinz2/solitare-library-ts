@@ -1,103 +1,18 @@
 import { Game } from "../src/index.js";
-import type {
-  Card,
-  Foundation,
-  Foundations,
-  GameState,
-  Rank,
-  Suit,
-  Tableau,
-} from "../src/index.js";
-
-const createSequenceRng = (values: ReadonlyArray<number>): (() => number) => {
-  let index = 0;
-
-  return () => {
-    const value = values[index % values.length];
-    index += 1;
-
-    if (value === undefined) {
-      throw new Error("RNG sequence cannot be empty");
-    }
-
-    return value;
-  };
-};
-
-const getStateSnapshot = (game: Game): GameState => ({
-  stock: game.stock,
-  waste: game.waste,
-  foundations: game.foundations,
-  tableau: game.tableau,
-});
-
-const getAllCards = (game: Game): Card[] => [
-  ...game.stock,
-  ...game.waste,
-  ...game.foundations[0].cards,
-  ...game.foundations[1].cards,
-  ...game.foundations[2].cards,
-  ...game.foundations[3].cards,
-  ...game.tableau[0],
-  ...game.tableau[1],
-  ...game.tableau[2],
-  ...game.tableau[3],
-  ...game.tableau[4],
-  ...game.tableau[5],
-  ...game.tableau[6],
-];
-
-const getCardKey = (card: Card): string => `${card.suit}-${card.rank}`;
-
-const createCard = (rank: Rank, suit: Suit, faceUp = true): Card => ({
-  suit,
-  rank,
-  faceUp,
-});
-
-const createFoundation = (
-  suit: Suit | null = null,
-  cards: Card[] = [],
-): Foundation => ({
-  suit,
-  cards,
-});
-
-const createEmptyFoundations = (): Foundations => [
-  createFoundation(),
-  createFoundation(),
-  createFoundation(),
-  createFoundation(),
-];
-
-const createEmptyTableau = (): Tableau => [[], [], [], [], [], [], []];
-
-const PrivateGameConstructor = Game as unknown as new (
-  state: GameState,
-) => Game;
-
-const createGameFromState = (state: GameState): Game => {
-  return new PrivateGameConstructor(state);
-};
-
-const expectConservedUniqueDeck = (game: Game): void => {
-  const allCards = getAllCards(game);
-  const uniqueCardKeys = new Set(allCards.map(getCardKey));
-
-  expect(allCards).toHaveLength(52);
-  expect(uniqueCardKeys.size).toBe(52);
-};
-
-const expectAllCardsFaceDirection = (
-  cards: Card[],
-  direction: "up" | "down",
-): void => {
-  const expectedFaceUp = direction === "up";
-
-  cards.forEach((card) => {
-    expect(card.faceUp).toBe(expectedFaceUp);
-  });
-};
+import {
+  expectAllCardsFaceDirection,
+  expectConservedUniqueDeck,
+} from "./test-assertions.js";
+import {
+  createCard,
+  createEmptyFoundations,
+  createEmptyTableau,
+  createFoundation,
+  createGameFromState,
+  createSequenceRng,
+  getCardKey,
+  getStateSnapshot,
+} from "./test-setup.js";
 
 describe("Game.create", () => {
   it("initializes tableau, stock, waste, and foundations with correct sizes", () => {
