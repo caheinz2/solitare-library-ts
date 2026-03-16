@@ -8,15 +8,19 @@ import type {
   Waste,
 } from "./types/state.js";
 import { createOrderedDeck, shuffleDeck } from "./deck.js";
-import { copyPile } from "./state-copy.js";
-import { dealInitialState } from "./state-ops.js";
+import { dealInitialState } from "./moves/deal-initial-state.js";
+import { drawCards } from "./moves/draw-cards.js";
+import { moveTableauCardToFoundation } from "./moves/move-tableau-to-foundation.js";
+import { moveWasteCardToFoundation } from "./moves/move-waste-to-foundation.js";
+import { copyFoundation } from "./utils/foundation-ops.js";
+import { copyStack } from "./utils/stack-ops.js";
 
 export type CreateGameOptions = Readonly<{
   rng?: () => number;
 }>;
 
 export class Game {
-  private readonly gameState: GameState;
+  private gameState: GameState;
 
   private constructor(state: GameState) {
     this.gameState = state;
@@ -32,21 +36,21 @@ export class Game {
   }
 
   public get stock(): Stock {
-    return copyPile(this.gameState.stock);
+    return copyStack(this.gameState.stock);
   }
 
   public get waste(): Waste {
-    return copyPile(this.gameState.waste);
+    return copyStack(this.gameState.waste);
   }
 
   public get foundations(): Foundations {
     const [first, second, third, fourth] = this.gameState.foundations;
 
     return [
-      copyPile(first),
-      copyPile(second),
-      copyPile(third),
-      copyPile(fourth),
+      copyFoundation(first),
+      copyFoundation(second),
+      copyFoundation(third),
+      copyFoundation(fourth),
     ];
   }
 
@@ -55,13 +59,13 @@ export class Game {
       this.gameState.tableau;
 
     return [
-      copyPile(first),
-      copyPile(second),
-      copyPile(third),
-      copyPile(fourth),
-      copyPile(fifth),
-      copyPile(sixth),
-      copyPile(seventh),
+      copyStack(first),
+      copyStack(second),
+      copyStack(third),
+      copyStack(fourth),
+      copyStack(fifth),
+      copyStack(sixth),
+      copyStack(seventh),
     ];
   }
 
@@ -80,7 +84,8 @@ export class Game {
 
   // Draws 3 cards from stock to waste.
   public draw(): Game {
-    throw new Error("Not implemented");
+    this.gameState = drawCards(this.gameState);
+    return this;
   }
 
   // Moves the top waste card to a tableau pile.
@@ -89,8 +94,9 @@ export class Game {
   }
 
   // Moves the top waste card to a foundation pile.
-  public moveWasteToFoundation(_foundationIndex: FoundationIndex): Game {
-    throw new Error("Not implemented");
+  public moveWasteToFoundation(foundationIndex: FoundationIndex): Game {
+    this.gameState = moveWasteCardToFoundation(this.gameState, foundationIndex);
+    return this;
   }
 
   // Moves the top card from one tableau pile to another.
@@ -100,9 +106,14 @@ export class Game {
 
   // Moves the top card from a tableau pile to a foundation pile.
   public moveTableauToFoundation(
-    _tableauIndex: TableauIndex,
-    _foundationIndex: FoundationIndex,
+    tableauIndex: TableauIndex,
+    foundationIndex: FoundationIndex,
   ): Game {
-    throw new Error("Not implemented");
+    this.gameState = moveTableauCardToFoundation(
+      this.gameState,
+      tableauIndex,
+      foundationIndex,
+    );
+    return this;
   }
 }
