@@ -1,5 +1,5 @@
 import { Game } from "../src/index.js";
-import type { Card, GameState } from "../src/index.js";
+import type { Card, GameState, Suit } from "../src/index.js";
 
 const createSequenceRng = (values: ReadonlyArray<number>): (() => number) => {
   let index = 0;
@@ -26,10 +26,10 @@ const getStateSnapshot = (game: Game): GameState => ({
 const getAllCards = (game: Game): ReadonlyArray<Card> => [
   ...game.stock,
   ...game.waste,
-  ...game.foundations[0],
-  ...game.foundations[1],
-  ...game.foundations[2],
-  ...game.foundations[3],
+  ...game.foundations[0].cards,
+  ...game.foundations[1].cards,
+  ...game.foundations[2].cards,
+  ...game.foundations[3].cards,
   ...game.tableau[0],
   ...game.tableau[1],
   ...game.tableau[2],
@@ -58,8 +58,9 @@ describe("Game.create", () => {
     expect(game.stock).toHaveLength(24);
     expect(game.waste).toHaveLength(0);
     expect(game.foundations).toHaveLength(4);
-    game.foundations.forEach((foundationPile) => {
-      expect(foundationPile).toHaveLength(0);
+    game.foundations.forEach((foundation) => {
+      expect(foundation.suit).toBeNull();
+      expect(foundation.cards).toHaveLength(0);
     });
   });
 
@@ -104,7 +105,7 @@ describe("Game.create", () => {
 });
 
 describe("Game immutability", () => {
-  it("returns defensive copies from getters", () => {
+  it("returns defensive copies from stock and tableau getters", () => {
     const game = Game.create({ rng: () => 0.5 });
     const stockView = game.stock as unknown as Card[];
     const tableauView = game.tableau;
@@ -117,10 +118,8 @@ describe("Game immutability", () => {
     const mutableCard = firstTableauCard as unknown as { faceUp: boolean };
     const beforeState = getStateSnapshot(game);
 
-    expect(() => {
-      stockView.push({ suit: "clubs", rank: "A", faceUp: false });
-      mutableCard.faceUp = false;
-    }).not.toThrow();
+    stockView.push({ suit: "clubs", rank: "A", faceUp: false });
+    mutableCard.faceUp = false;
 
     const afterState = getStateSnapshot(game);
     const freshStock = game.stock;
@@ -134,6 +133,34 @@ describe("Game immutability", () => {
     expect(stockView).toHaveLength(25);
     expect(freshStock).toHaveLength(24);
     expect(freshTopTableauCard.faceUp).toBe(true);
+    expect(afterState).toEqual(beforeState);
+  });
+
+  it("returns defensive copies from foundation getters", () => {
+    const game = Game.create({ rng: () => 0.5 });
+    const foundationView = game.foundations as unknown as Array<{
+      suit: Suit | null;
+      cards: Card[];
+    }>;
+    const firstFoundation = foundationView[0];
+    const beforeState = getStateSnapshot(game);
+
+    if (!firstFoundation) {
+      throw new Error("Expected first foundation");
+    }
+
+    firstFoundation.suit = "hearts";
+    firstFoundation.cards.push({ suit: "clubs", rank: "A", faceUp: true });
+
+    const afterState = getStateSnapshot(game);
+    const freshFoundation = game.foundations[0];
+
+    if (!freshFoundation) {
+      throw new Error("Expected first foundation");
+    }
+
+    expect(freshFoundation.suit).toBeNull();
+    expect(freshFoundation.cards).toHaveLength(0);
     expect(afterState).toEqual(beforeState);
   });
 });
@@ -191,7 +218,12 @@ describe("Game actions", () => {
     const emptyGame = new GameConstructor({
       stock: [],
       waste: [],
-      foundations: [[], [], [], []],
+      foundations: [
+        { suit: null, cards: [] },
+        { suit: null, cards: [] },
+        { suit: null, cards: [] },
+        { suit: null, cards: [] },
+      ],
       tableau: [[], [], [], [], [], [], []],
     });
 
@@ -225,7 +257,7 @@ describe("Game debug helpers", () => {
   it("returns the full game state as formatted JSON", () => {
     const game = Game.create({ rng: () => 0.5 });
     const debugOutput = game.debugString();
-    const parsedState = JSON.parse(debugOutput) as GameState;
+    const parsedState = JSON.parse(debugOutput);
 
     expect(parsedState).toEqual(getStateSnapshot(game));
   });

@@ -8,7 +8,7 @@ import type {
   Waste,
 } from "./types/state.js";
 import { createOrderedDeck, shuffleDeck } from "./deck.js";
-import { copyPile } from "./state-copy.js";
+import { copyFoundation, copyPile } from "./state-copy.js";
 import { dealInitialState, drawCards } from "./state-ops.js";
 
 export type CreateGameOptions = Readonly<{
@@ -43,10 +43,10 @@ export class Game {
     const [first, second, third, fourth] = this.gameState.foundations;
 
     return [
-      copyPile(first),
-      copyPile(second),
-      copyPile(third),
-      copyPile(fourth),
+      copyFoundation(first),
+      copyFoundation(second),
+      copyFoundation(third),
+      copyFoundation(fourth),
     ];
   }
 

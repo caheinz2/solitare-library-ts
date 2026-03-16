@@ -1,6 +1,11 @@
 import type { Card } from "./types/cards.js";
-import type { GameState } from "./types/state.js";
+import type { Foundation, GameState, Stock, Waste } from "./types/state.js";
 import { DRAW_COUNT, TABLEAU_INDICES } from "./game-constants.js";
+
+const createEmptyFoundation = (): Foundation => ({
+  suit: null,
+  cards: [],
+});
 
 export const dealInitialState = (deck: ReadonlyArray<Card>): GameState => {
   const workingDeck = [...deck];
@@ -37,14 +42,19 @@ export const dealInitialState = (deck: ReadonlyArray<Card>): GameState => {
   return {
     stock,
     waste: [],
-    foundations: [[], [], [], []],
+    foundations: [
+      createEmptyFoundation(),
+      createEmptyFoundation(),
+      createEmptyFoundation(),
+      createEmptyFoundation(),
+    ],
     tableau,
   };
 };
 
 const drawFromStock = (
-  stock: ReadonlyArray<Card>,
-  waste: ReadonlyArray<Card>,
+  stock: Stock,
+  waste: Waste,
 ): Pick<GameState, "stock" | "waste"> => {
   const nextStock = [...stock];
   const nextWaste = [...waste];

@@ -1,10 +1,13 @@
-import type { Card } from './cards.js';
+import type { Card, Suit } from './cards.js';
 
 export type Stack<T> = ReadonlyArray<T>;
 
 export type Stock = Stack<Card>;
 export type Waste = Stack<Card>;
-export type Foundation = Stack<Card>;
+export type Foundation = Readonly<{
+  suit: Suit | null;
+  cards: Stack<Card>;
+}>;
 export type TableauPile = Stack<Card>;
 
 export type Foundations = readonly [Foundation, Foundation, Foundation, Foundation];
