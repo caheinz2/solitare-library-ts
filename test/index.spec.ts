@@ -167,7 +167,7 @@ describe("Game actions", () => {
       expectAllCardsFaceDirection(game.stock, "down");
     });
 
-    it("is a no-op by value when both stock and waste are empty", () => {
+    it("does not draw cards when both stock and waste are empty", () => {
       const game = createGameFromState({
         stock: [],
         waste: [],
@@ -181,7 +181,7 @@ describe("Game actions", () => {
       expect(getStateSnapshot(game)).toEqual(beforeState);
     });
 
-    it("mutates current game state when drawing", () => {
+    it("mutates current game state", () => {
       const game = Game.create({ rng: () => 0.5 });
       const beforeState = getStateSnapshot(game);
 
@@ -299,6 +299,7 @@ describe("Game actions", () => {
     });
 
     it("preserves all 52 unique cards after a valid waste-to-foundation move", () => {
+      // TODO: revisit this test - not all rng seeds should pass, seems to indicate an issue with shuffling.
       const game = Game.create({ rng: () => 0.5 });
 
       for (let drawIndex = 0; drawIndex < 24; drawIndex += 1) {
