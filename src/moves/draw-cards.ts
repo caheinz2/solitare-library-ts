@@ -2,8 +2,9 @@ import { DRAW_COUNT } from "../game-constants.js";
 import { addCardToTop, removeTopCard } from "../utils/stack-ops.js";
 import { isStockAndWasteEmpty, isStockEmpty } from "../utils/state-ops.js";
 import type { MoveHandler } from "../types/moves.js";
+import { GameState } from "../types/state.js";
 
-const moveWasteBackToStock: MoveHandler = (state) => {
+const moveWasteBackToStock = (state: GameState) => {
   while (state.waste.length > 0) {
     const card = removeTopCard(state.waste);
 
@@ -18,7 +19,7 @@ const moveWasteBackToStock: MoveHandler = (state) => {
   return state;
 };
 
-const drawFromStock: MoveHandler = (state) => {
+const drawFromStock = (state: GameState) => {
   const cardsToDraw = Math.min(DRAW_COUNT, state.stock.length);
 
   for (let drawIndex = 0; drawIndex < cardsToDraw; drawIndex += 1) {
