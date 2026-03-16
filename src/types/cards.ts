@@ -14,8 +14,8 @@ export type Rank =
   | "Q"
   | "K";
 
-export type Card = Readonly<{
+export type Card = {
   suit: Suit;
   rank: Rank;
   faceUp: boolean;
-}>;
+};

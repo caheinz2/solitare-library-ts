@@ -28,14 +28,16 @@ export const dealInitialState = (deck: ReadonlyArray<Card>): GameState => {
         throw new Error("Cannot initialize game with an incomplete deck");
       }
 
-      pile.push({
-        ...nextCard,
-        faceUp: cardIndex === pileSize - 1,
-      });
+      nextCard.faceUp = cardIndex === pileSize - 1;
+      pile.push(nextCard);
     }
   }
 
-  const stock = workingDeck.map((card) => ({ ...card, faceUp: false }));
+  const stock = workingDeck;
+
+  stock.forEach((card) => {
+    card.faceUp = false;
+  });
 
   const foundations: Foundations = [
     { suit: null, cards: [] },
@@ -62,10 +64,8 @@ const drawFromStock = (state: GameState): GameState => {
       break;
     }
 
-    state.waste.push({
-      ...drawnCard,
-      faceUp: true,
-    });
+    drawnCard.faceUp = true;
+    state.waste.push(drawnCard);
   }
 
   return state;
@@ -79,10 +79,8 @@ const moveWasteBackToStock = (state: GameState): GameState => {
       break;
     }
 
-    state.stock.push({
-      ...card,
-      faceUp: false,
-    });
+    card.faceUp = false;
+    state.stock.push(card);
   }
 
   return state;
@@ -138,11 +136,9 @@ export const moveWasteCardToFoundation: MoveHandler<[FoundationIndex]> = (
   }
 
   state.waste.pop();
+  cardToMove.faceUp = true;
   targetFoundation.suit ??= cardToMove.suit;
-  targetFoundation.cards.push({
-    ...cardToMove,
-    faceUp: true,
-  });
+  targetFoundation.cards.push(cardToMove);
 
   return state;
 };

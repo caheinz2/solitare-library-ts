@@ -154,11 +154,10 @@ describe("Game immutability", () => {
       throw new Error("Expected at least one card in tableau pile 0");
     }
 
-    const mutableCard = firstTableauCard as unknown as { faceUp: boolean };
     const beforeState = getStateSnapshot(game);
 
     stockView.push({ suit: "clubs", rank: "A", faceUp: false });
-    mutableCard.faceUp = false;
+    firstTableauCard.faceUp = false;
 
     const afterState = getStateSnapshot(game);
     const freshStock = game.stock;
