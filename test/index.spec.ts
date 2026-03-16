@@ -88,6 +88,17 @@ const expectConservedUniqueDeck = (game: Game): void => {
   expect(uniqueCardKeys.size).toBe(52);
 };
 
+const expectAllCardsFaceDirection = (
+  cards: Card[],
+  direction: "up" | "down",
+): void => {
+  const expectedFaceUp = direction === "up";
+
+  cards.forEach((card) => {
+    expect(card.faceUp).toBe(expectedFaceUp);
+  });
+};
+
 describe("Game.create", () => {
   it("initializes tableau, stock, waste, and foundations with correct sizes", () => {
     const game = Game.create({ rng: () => 0.5 });
@@ -116,9 +127,7 @@ describe("Game.create", () => {
   it("keeps all stock cards face down", () => {
     const game = Game.create({ rng: () => 0.5 });
 
-    game.stock.forEach((card) => {
-      expect(card.faceUp).toBe(false);
-    });
+    expectAllCardsFaceDirection(game.stock, "down");
   });
 
   it("conserves all 52 unique cards across all piles", () => {
@@ -201,206 +210,202 @@ describe("Game immutability", () => {
 });
 
 describe("Game actions", () => {
-  it("draws 3 cards from stock to waste and flips drawn cards face up", () => {
-    const game = Game.create({ rng: () => 0.5 });
-
-    const nextGame = game.draw();
-
-    expect(nextGame.stock).toHaveLength(21);
-    expect(nextGame.waste).toHaveLength(3);
-    nextGame.waste.forEach((card) => {
-      expect(card.faceUp).toBe(true);
-    });
-  });
-
-  it("moves all stock cards to waste after 8 draws", () => {
-    let game = Game.create({ rng: () => 0.5 });
-
-    for (let drawIndex = 0; drawIndex < 8; drawIndex += 1) {
-      game = game.draw();
-    }
-
-    expect(game.stock).toHaveLength(0);
-    expect(game.waste).toHaveLength(24);
-  });
-
-  it("recycles waste into stock and draws in the same call", () => {
-    let game = Game.create({ rng: () => 0.5 });
-
-    for (let drawIndex = 0; drawIndex < 8; drawIndex += 1) {
-      game = game.draw();
-    }
-
-    const wasteBeforeRecycle = game.waste;
-    const expectedWasteKeys = wasteBeforeRecycle.slice(0, 3).map(getCardKey);
-
-    const recycledGame = game.draw();
-    const recycledWasteKeys = recycledGame.waste.map(getCardKey);
-
-    expect(recycledGame.stock).toHaveLength(21);
-    expect(recycledGame.waste).toHaveLength(3);
-    expect(recycledWasteKeys).toEqual(expectedWasteKeys);
-    recycledGame.waste.forEach((card) => {
-      expect(card.faceUp).toBe(true);
-    });
-    recycledGame.stock.forEach((card) => {
-      expect(card.faceUp).toBe(false);
-    });
-  });
-
-  it("is a no-op by value when both stock and waste are empty", () => {
-    const emptyGame = createGameFromState({
-      stock: [],
-      waste: [],
-      foundations: createEmptyFoundations(),
-      tableau: createEmptyTableau(),
-    });
-
-    const nextGame = emptyGame.draw();
-
-    expect(nextGame).toBe(emptyGame);
-    expect(getStateSnapshot(nextGame)).toEqual(getStateSnapshot(emptyGame));
-  });
-
-  it("mutates current game state when drawing", () => {
-    const game = Game.create({ rng: () => 0.5 });
-    const beforeState = getStateSnapshot(game);
-
-    const nextGame = game.draw();
-
-    expect(nextGame).toBe(game);
-    expect(getStateSnapshot(nextGame)).not.toEqual(beforeState);
-  });
-
-  it("moves an ace from waste to an empty foundation", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [createCard("A", "clubs")],
-      foundations: createEmptyFoundations(),
-      tableau: createEmptyTableau(),
-    });
-
-    const nextGame = game.moveWasteToFoundation(0);
-
-    expect(nextGame).toBe(game);
-    expect(game.waste).toEqual([]);
-    expect(game.foundations[0]).toEqual(
-      createFoundation("clubs", [createCard("A", "clubs")]),
-    );
-  });
-
-  it("moves the next same-suit rank from waste to foundation", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [createCard("2", "clubs")],
-      foundations: [
-        createFoundation("clubs", [createCard("A", "clubs")]),
-        createFoundation(),
-        createFoundation(),
-        createFoundation(),
-      ],
-      tableau: createEmptyTableau(),
-    });
-
-    game.moveWasteToFoundation(0);
-
-    expect(game.waste).toEqual([]);
-    expect(game.foundations[0]).toEqual(
-      createFoundation("clubs", [
-        createCard("A", "clubs"),
-        createCard("2", "clubs"),
-      ]),
-    );
-  });
-
-  it("no-ops waste-to-foundation when waste is empty", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [],
-      foundations: createEmptyFoundations(),
-      tableau: createEmptyTableau(),
-    });
-    const beforeState = getStateSnapshot(game);
-
-    game.moveWasteToFoundation(0);
-
-    expect(getStateSnapshot(game)).toEqual(beforeState);
-  });
-
-  it("no-ops waste-to-foundation when moving a non-ace to an empty foundation", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [createCard("2", "clubs")],
-      foundations: createEmptyFoundations(),
-      tableau: createEmptyTableau(),
-    });
-    const beforeState = getStateSnapshot(game);
-
-    game.moveWasteToFoundation(0);
-
-    expect(getStateSnapshot(game)).toEqual(beforeState);
-  });
-
-  it("no-ops waste-to-foundation when the card suit does not match", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [createCard("2", "hearts")],
-      foundations: [
-        createFoundation("clubs", [createCard("A", "clubs")]),
-        createFoundation(),
-        createFoundation(),
-        createFoundation(),
-      ],
-      tableau: createEmptyTableau(),
-    });
-    const beforeState = getStateSnapshot(game);
-
-    game.moveWasteToFoundation(0);
-
-    expect(getStateSnapshot(game)).toEqual(beforeState);
-  });
-
-  it("no-ops waste-to-foundation when the card rank skips the next foundation rank", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [createCard("3", "clubs")],
-      foundations: [
-        createFoundation("clubs", [createCard("A", "clubs")]),
-        createFoundation(),
-        createFoundation(),
-        createFoundation(),
-      ],
-      tableau: createEmptyTableau(),
-    });
-    const beforeState = getStateSnapshot(game);
-
-    game.moveWasteToFoundation(0);
-
-    expect(getStateSnapshot(game)).toEqual(beforeState);
-  });
-
-  it("preserves all 52 unique cards after a valid waste-to-foundation move", () => {
-    const game = Game.create({ rng: () => 0.5 });
-
-    for (let drawIndex = 0; drawIndex < 24; drawIndex += 1) {
-      const topWasteCard = game.waste[game.waste.length - 1];
-
-      if (topWasteCard?.rank === "A") {
-        break;
-      }
+  describe("drawCards", () => {
+    it("draws 3 cards from stock to waste and flips drawn cards face up", () => {
+      const game = Game.create({ rng: () => 0.5 });
 
       game.draw();
-    }
 
-    const topWasteCard = game.waste[game.waste.length - 1];
+      expect(game.stock).toHaveLength(21);
+      expect(game.waste).toHaveLength(3);
+      expectAllCardsFaceDirection(game.waste, "up");
+    });
 
-    if (!topWasteCard || topWasteCard.rank !== "A") {
-      throw new Error("Expected to find an ace on top of waste");
-    }
+    it("moves all stock cards to waste after 8 draws", () => {
+      const game = Game.create({ rng: () => 0.5 });
 
-    game.moveWasteToFoundation(0);
+      for (let drawIndex = 0; drawIndex < 8; drawIndex += 1) {
+        game.draw();
+      }
 
-    expectConservedUniqueDeck(game);
+      expect(game.stock).toHaveLength(0);
+      expect(game.waste).toHaveLength(24);
+    });
+
+    it("recycles waste into stock and draws in the same call", () => {
+      const game = Game.create({ rng: () => 0.5 });
+
+      for (let drawIndex = 0; drawIndex < 8; drawIndex += 1) {
+        game.draw();
+      }
+
+      const wasteBeforeRecycle = game.waste;
+      const expectedWasteKeys = wasteBeforeRecycle.slice(0, 3).map(getCardKey);
+
+      game.draw();
+      const recycledWasteKeys = game.waste.map(getCardKey);
+
+      expect(game.stock).toHaveLength(21);
+      expect(game.waste).toHaveLength(3);
+      expect(recycledWasteKeys).toEqual(expectedWasteKeys);
+      expectAllCardsFaceDirection(game.waste, "up");
+      expectAllCardsFaceDirection(game.stock, "down");
+    });
+
+    it("is a no-op by value when both stock and waste are empty", () => {
+      const game = createGameFromState({
+        stock: [],
+        waste: [],
+        foundations: createEmptyFoundations(),
+        tableau: createEmptyTableau(),
+      });
+      const beforeState = getStateSnapshot(game);
+
+      expect(game.draw()).toBe(game);
+
+      expect(getStateSnapshot(game)).toEqual(beforeState);
+    });
+
+    it("mutates current game state when drawing", () => {
+      const game = Game.create({ rng: () => 0.5 });
+      const beforeState = getStateSnapshot(game);
+
+      game.draw();
+
+      expect(getStateSnapshot(game)).not.toEqual(beforeState);
+    });
+  });
+
+  describe("moveWasteToFoundation", () => {
+    it("moves an ace from waste to an empty foundation", () => {
+      const game = createGameFromState({
+        stock: [],
+        waste: [createCard("A", "clubs")],
+        foundations: createEmptyFoundations(),
+        tableau: createEmptyTableau(),
+      });
+
+      expect(game.moveWasteToFoundation(0)).toBe(game);
+
+      expect(game.waste).toEqual([]);
+      expect(game.foundations[0]).toEqual(
+        createFoundation("clubs", [createCard("A", "clubs")]),
+      );
+    });
+
+    it("moves the next same-suit rank from waste to foundation", () => {
+      const game = createGameFromState({
+        stock: [],
+        waste: [createCard("2", "clubs")],
+        foundations: [
+          createFoundation("clubs", [createCard("A", "clubs")]),
+          createFoundation(),
+          createFoundation(),
+          createFoundation(),
+        ],
+        tableau: createEmptyTableau(),
+      });
+
+      game.moveWasteToFoundation(0);
+
+      expect(game.waste).toEqual([]);
+      expect(game.foundations[0]).toEqual(
+        createFoundation("clubs", [
+          createCard("A", "clubs"),
+          createCard("2", "clubs"),
+        ]),
+      );
+    });
+
+    it("does not move card when waste is empty", () => {
+      const game = createGameFromState({
+        stock: [],
+        waste: [],
+        foundations: createEmptyFoundations(),
+        tableau: createEmptyTableau(),
+      });
+      const beforeState = getStateSnapshot(game);
+
+      game.moveWasteToFoundation(0);
+
+      expect(getStateSnapshot(game)).toEqual(beforeState);
+    });
+
+    it("does not move card when moving a non-ace to an empty foundation", () => {
+      const game = createGameFromState({
+        stock: [],
+        waste: [createCard("2", "clubs")],
+        foundations: createEmptyFoundations(),
+        tableau: createEmptyTableau(),
+      });
+      const beforeState = getStateSnapshot(game);
+
+      game.moveWasteToFoundation(0);
+
+      expect(getStateSnapshot(game)).toEqual(beforeState);
+    });
+
+    it("does not move card when the card suit does not match", () => {
+      const game = createGameFromState({
+        stock: [],
+        waste: [createCard("2", "hearts")],
+        foundations: [
+          createFoundation("clubs", [createCard("A", "clubs")]),
+          createFoundation(),
+          createFoundation(),
+          createFoundation(),
+        ],
+        tableau: createEmptyTableau(),
+      });
+      const beforeState = getStateSnapshot(game);
+
+      game.moveWasteToFoundation(0);
+
+      expect(getStateSnapshot(game)).toEqual(beforeState);
+    });
+
+    it("does not move card when the card rank skips the next foundation rank", () => {
+      const game = createGameFromState({
+        stock: [],
+        waste: [createCard("3", "clubs")],
+        foundations: [
+          createFoundation("clubs", [createCard("A", "clubs")]),
+          createFoundation(),
+          createFoundation(),
+          createFoundation(),
+        ],
+        tableau: createEmptyTableau(),
+      });
+      const beforeState = getStateSnapshot(game);
+
+      game.moveWasteToFoundation(0);
+
+      expect(getStateSnapshot(game)).toEqual(beforeState);
+    });
+
+    it("preserves all 52 unique cards after a valid waste-to-foundation move", () => {
+      const game = Game.create({ rng: () => 0.5 });
+
+      for (let drawIndex = 0; drawIndex < 24; drawIndex += 1) {
+        const topWasteCard = game.waste[game.waste.length - 1];
+
+        if (topWasteCard?.rank === "A") {
+          break;
+        }
+
+        game.draw();
+      }
+
+      const topWasteCard = game.waste[game.waste.length - 1];
+
+      if (!topWasteCard || topWasteCard.rank !== "A") {
+        throw new Error("Expected to find an ace on top of waste");
+      }
+
+      game.moveWasteToFoundation(0);
+
+      expectConservedUniqueDeck(game);
+    });
   });
 
   it("still throws Not implemented for move action methods not in scope", () => {
