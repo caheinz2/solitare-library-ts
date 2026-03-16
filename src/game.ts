@@ -9,7 +9,11 @@ import type {
 } from "./types/state.js";
 import { createOrderedDeck, shuffleDeck } from "./deck.js";
 import { copyFoundation, copyPile } from "./state-copy.js";
-import { dealInitialState, drawCards } from "./state-ops.js";
+import {
+  dealInitialState,
+  drawCards,
+  moveWasteCardToFoundation,
+} from "./state-ops.js";
 
 export type CreateGameOptions = Readonly<{
   rng?: () => number;
@@ -90,8 +94,9 @@ export class Game {
   }
 
   // Moves the top waste card to a foundation pile.
-  public moveWasteToFoundation(_foundationIndex: FoundationIndex): Game {
-    throw new Error("Not implemented");
+  public moveWasteToFoundation(foundationIndex: FoundationIndex): Game {
+    this.gameState = moveWasteCardToFoundation(this.gameState, foundationIndex);
+    return this;
   }
 
   // Moves the top card from one tableau pile to another.

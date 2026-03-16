@@ -1,6 +1,15 @@
 import type { Card } from "./types/cards.js";
-import type { Foundation, GameState, Stock, Waste } from "./types/state.js";
-import { DRAW_COUNT, TABLEAU_INDICES } from "./game-constants.js";
+import type {
+  Foundation,
+  FoundationIndex,
+  GameState,
+} from "./types/state.js";
+import { DRAW_COUNT, RANKS, TABLEAU_INDICES } from "./game-constants.js";
+
+type MoveHandler<TArgs extends ReadonlyArray<unknown> = []> = (
+  state: GameState,
+  ...args: TArgs
+) => GameState;
 
 const createEmptyFoundation = (): Foundation => ({
   suit: null,
@@ -52,43 +61,38 @@ export const dealInitialState = (deck: ReadonlyArray<Card>): GameState => {
   };
 };
 
-const drawFromStock = (
-  stock: Stock,
-  waste: Waste,
-): Pick<GameState, "stock" | "waste"> => {
-  const nextStock = [...stock];
-  const nextWaste = [...waste];
-  const cardsToDraw = Math.min(DRAW_COUNT, nextStock.length);
+const drawFromStock = (state: GameState): void => {
+  const cardsToDraw = Math.min(DRAW_COUNT, state.stock.length);
 
   for (let drawIndex = 0; drawIndex < cardsToDraw; drawIndex += 1) {
-    const drawnCard = nextStock.pop();
+    const drawnCard = state.stock.pop();
 
     if (!drawnCard) {
       break;
     }
 
-    nextWaste.push({
+    state.waste.push({
       ...drawnCard,
       faceUp: true,
     });
   }
-
-  return {
-    stock: nextStock,
-    waste: nextWaste,
-  };
 };
 
 const moveWasteBackToStock = (state: GameState): GameState => {
-  const recycledStock = [...state.waste]
-    .reverse()
-    .map((card) => ({ ...card, faceUp: false }));
+  while (state.waste.length > 0) {
+    const card = state.waste.pop();
 
-  return {
-    ...state,
-    stock: recycledStock,
-    waste: [],
-  };
+    if (!card) {
+      break;
+    }
+
+    state.stock.push({
+      ...card,
+      faceUp: false,
+    });
+  }
+
+  return state;
 };
 
 const isStockAndWasteEmpty = (state: GameState): boolean =>
@@ -101,12 +105,51 @@ export const drawCards = (state: GameState): GameState => {
     return state;
   }
 
-  const drawableState = hasCardsInStock(state)
-    ? state
-    : moveWasteBackToStock(state);
+  if (!hasCardsInStock(state)) {
+    moveWasteBackToStock(state);
+  }
 
-  return {
-    ...drawableState,
-    ...drawFromStock(drawableState.stock, drawableState.waste),
-  };
+  drawFromStock(state);
+
+  return state;
+};
+
+export const moveWasteCardToFoundation: MoveHandler<[FoundationIndex]> = (
+  state,
+  foundationIndex,
+): GameState => {
+  const cardToMove = state.waste[state.waste.length - 1];
+
+  if (!cardToMove) {
+    return state;
+  }
+
+  const targetFoundation = state.foundations[foundationIndex];
+  const topFoundationCard =
+    targetFoundation.cards[targetFoundation.cards.length - 1];
+
+  if (!topFoundationCard && cardToMove.rank !== "A") {
+    return state;
+  }
+
+  if (topFoundationCard) {
+    const cardRankIndex = RANKS.indexOf(cardToMove.rank);
+    const topRankIndex = RANKS.indexOf(topFoundationCard.rank);
+
+    if (
+      targetFoundation.suit !== cardToMove.suit ||
+      cardRankIndex !== topRankIndex + 1
+    ) {
+      return state;
+    }
+  }
+
+  state.waste.pop();
+  targetFoundation.suit ??= cardToMove.suit;
+  targetFoundation.cards.push({
+    ...cardToMove,
+    faceUp: true,
+  });
+
+  return state;
 };

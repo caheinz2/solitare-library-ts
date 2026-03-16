@@ -1,5 +1,13 @@
 import { Game } from "../src/index.js";
-import type { Card, GameState, Suit } from "../src/index.js";
+import type {
+  Card,
+  Foundation,
+  Foundations,
+  GameState,
+  Rank,
+  Suit,
+  Tableau,
+} from "../src/index.js";
 
 const createSequenceRng = (values: ReadonlyArray<number>): (() => number) => {
   let index = 0;
@@ -23,7 +31,7 @@ const getStateSnapshot = (game: Game): GameState => ({
   tableau: game.tableau,
 });
 
-const getAllCards = (game: Game): ReadonlyArray<Card> => [
+const getAllCards = (game: Game): Card[] => [
   ...game.stock,
   ...game.waste,
   ...game.foundations[0].cards,
@@ -40,6 +48,37 @@ const getAllCards = (game: Game): ReadonlyArray<Card> => [
 ];
 
 const getCardKey = (card: Card): string => `${card.suit}-${card.rank}`;
+
+const createCard = (rank: Rank, suit: Suit, faceUp = true): Card => ({
+  suit,
+  rank,
+  faceUp,
+});
+
+const createFoundation = (
+  suit: Suit | null = null,
+  cards: Card[] = [],
+): Foundation => ({
+  suit,
+  cards,
+});
+
+const createEmptyFoundations = (): Foundations => [
+  createFoundation(),
+  createFoundation(),
+  createFoundation(),
+  createFoundation(),
+];
+
+const createEmptyTableau = (): Tableau => [[], [], [], [], [], [], []];
+
+const PrivateGameConstructor = Game as unknown as new (
+  state: GameState,
+) => Game;
+
+const createGameFromState = (state: GameState): Game => {
+  return new PrivateGameConstructor(state);
+};
 
 const expectConservedUniqueDeck = (game: Game): void => {
   const allCards = getAllCards(game);
@@ -214,17 +253,11 @@ describe("Game actions", () => {
   });
 
   it("is a no-op by value when both stock and waste are empty", () => {
-    const GameConstructor = Game as unknown as { new (state: GameState): Game };
-    const emptyGame = new GameConstructor({
+    const emptyGame = createGameFromState({
       stock: [],
       waste: [],
-      foundations: [
-        { suit: null, cards: [] },
-        { suit: null, cards: [] },
-        { suit: null, cards: [] },
-        { suit: null, cards: [] },
-      ],
-      tableau: [[], [], [], [], [], [], []],
+      foundations: createEmptyFoundations(),
+      tableau: createEmptyTableau(),
     });
 
     const nextGame = emptyGame.draw();
@@ -243,11 +276,141 @@ describe("Game actions", () => {
     expect(getStateSnapshot(nextGame)).not.toEqual(beforeState);
   });
 
-  it("throws Not implemented for move action methods in this branch", () => {
+  it("moves an ace from waste to an empty foundation", () => {
+    const game = createGameFromState({
+      stock: [],
+      waste: [createCard("A", "clubs")],
+      foundations: createEmptyFoundations(),
+      tableau: createEmptyTableau(),
+    });
+
+    const nextGame = game.moveWasteToFoundation(0);
+
+    expect(nextGame).toBe(game);
+    expect(game.waste).toEqual([]);
+    expect(game.foundations[0]).toEqual(
+      createFoundation("clubs", [createCard("A", "clubs")]),
+    );
+  });
+
+  it("moves the next same-suit rank from waste to foundation", () => {
+    const game = createGameFromState({
+      stock: [],
+      waste: [createCard("2", "clubs")],
+      foundations: [
+        createFoundation("clubs", [createCard("A", "clubs")]),
+        createFoundation(),
+        createFoundation(),
+        createFoundation(),
+      ],
+      tableau: createEmptyTableau(),
+    });
+
+    game.moveWasteToFoundation(0);
+
+    expect(game.waste).toEqual([]);
+    expect(game.foundations[0]).toEqual(
+      createFoundation("clubs", [
+        createCard("A", "clubs"),
+        createCard("2", "clubs"),
+      ]),
+    );
+  });
+
+  it("no-ops waste-to-foundation when waste is empty", () => {
+    const game = createGameFromState({
+      stock: [],
+      waste: [],
+      foundations: createEmptyFoundations(),
+      tableau: createEmptyTableau(),
+    });
+    const beforeState = getStateSnapshot(game);
+
+    game.moveWasteToFoundation(0);
+
+    expect(getStateSnapshot(game)).toEqual(beforeState);
+  });
+
+  it("no-ops waste-to-foundation when moving a non-ace to an empty foundation", () => {
+    const game = createGameFromState({
+      stock: [],
+      waste: [createCard("2", "clubs")],
+      foundations: createEmptyFoundations(),
+      tableau: createEmptyTableau(),
+    });
+    const beforeState = getStateSnapshot(game);
+
+    game.moveWasteToFoundation(0);
+
+    expect(getStateSnapshot(game)).toEqual(beforeState);
+  });
+
+  it("no-ops waste-to-foundation when the card suit does not match", () => {
+    const game = createGameFromState({
+      stock: [],
+      waste: [createCard("2", "hearts")],
+      foundations: [
+        createFoundation("clubs", [createCard("A", "clubs")]),
+        createFoundation(),
+        createFoundation(),
+        createFoundation(),
+      ],
+      tableau: createEmptyTableau(),
+    });
+    const beforeState = getStateSnapshot(game);
+
+    game.moveWasteToFoundation(0);
+
+    expect(getStateSnapshot(game)).toEqual(beforeState);
+  });
+
+  it("no-ops waste-to-foundation when the card rank skips the next foundation rank", () => {
+    const game = createGameFromState({
+      stock: [],
+      waste: [createCard("3", "clubs")],
+      foundations: [
+        createFoundation("clubs", [createCard("A", "clubs")]),
+        createFoundation(),
+        createFoundation(),
+        createFoundation(),
+      ],
+      tableau: createEmptyTableau(),
+    });
+    const beforeState = getStateSnapshot(game);
+
+    game.moveWasteToFoundation(0);
+
+    expect(getStateSnapshot(game)).toEqual(beforeState);
+  });
+
+  it("preserves all 52 unique cards after a valid waste-to-foundation move", () => {
+    const game = Game.create({ rng: () => 0.5 });
+
+    for (let drawIndex = 0; drawIndex < 24; drawIndex += 1) {
+      const topWasteCard = game.waste[game.waste.length - 1];
+
+      if (topWasteCard?.rank === "A") {
+        break;
+      }
+
+      game.draw();
+    }
+
+    const topWasteCard = game.waste[game.waste.length - 1];
+
+    if (!topWasteCard || topWasteCard.rank !== "A") {
+      throw new Error("Expected to find an ace on top of waste");
+    }
+
+    game.moveWasteToFoundation(0);
+
+    expectConservedUniqueDeck(game);
+  });
+
+  it("still throws Not implemented for move action methods not in scope", () => {
     const game = Game.create({ rng: () => 0.5 });
 
     expect(() => game.moveWasteToTableau(0)).toThrow("Not implemented");
-    expect(() => game.moveWasteToFoundation(0)).toThrow("Not implemented");
     expect(() => game.moveTableauToTableau(0, 1)).toThrow("Not implemented");
     expect(() => game.moveTableauToFoundation(0, 0)).toThrow("Not implemented");
   });
