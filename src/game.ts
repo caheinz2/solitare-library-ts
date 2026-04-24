@@ -12,6 +12,7 @@ import { dealInitialState } from "./moves/deal-initial-state.js";
 import { drawCards } from "./moves/draw-cards.js";
 import { moveTableauCardToFoundation } from "./moves/move-tableau-to-foundation.js";
 import { moveWasteCardToFoundation } from "./moves/move-waste-to-foundation.js";
+import { moveWasteCardToTableau } from "./moves/move-waste-to-tableau.js";
 import { copyFoundation } from "./utils/foundation-ops.js";
 import { copyStack } from "./utils/stack-ops.js";
 
@@ -89,8 +90,9 @@ export class Game {
   }
 
   // Moves the top waste card to a tableau pile.
-  public moveWasteToTableau(_tableauIndex: TableauIndex): Game {
-    throw new Error("Not implemented");
+  public moveWasteToTableau(tableauIndex: TableauIndex): Game {
+    this.gameState = moveWasteCardToTableau(this.gameState, tableauIndex);
+    return this;
   }
 
   // Moves the top waste card to a foundation pile.
