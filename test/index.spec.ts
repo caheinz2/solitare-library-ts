@@ -238,6 +238,20 @@ describe("Game actions", () => {
       expect(getStateSnapshot(game)).toEqual(beforeState);
     });
 
+    it("does not move the top waste card when it is face down", () => {
+      const game = createGameFromState({
+        stock: [],
+        waste: [createCard("K", "clubs", false)],
+        foundations: createEmptyFoundations(),
+        tableau: createEmptyTableau(),
+      });
+      const beforeState = getStateSnapshot(game);
+
+      game.moveWasteToTableau(0);
+
+      expect(getStateSnapshot(game)).toEqual(beforeState);
+    });
+
     it("does not move a non-king to an empty tableau pile", () => {
       const game = createGameFromState({
         stock: [],

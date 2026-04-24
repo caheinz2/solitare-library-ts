@@ -15,7 +15,7 @@ export const moveWasteCardToTableau: MoveHandler<[TableauIndex]> = (
 ) => {
   const cardToMove = peekTopCard(state.waste);
 
-  if (!cardToMove) {
+  if (!cardToMove || !cardToMove.faceUp) {
     return state;
   }
 
