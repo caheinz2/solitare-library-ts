@@ -1,36 +1,29 @@
 import type { MoveHandler } from "../types/moves.js";
 import type { TableauIndex } from "../types/state.js";
 import {
-  peekTopCard,
-  removeTopCardAndFlipNext,
-} from "../utils/stack-ops.js";
-import {
-  addCardToTableau,
-  canMoveCardToTableau,
+  addCardsToTableau,
+  canMoveTableauRunToTableau,
+  removeTableauRun,
+  revealTopTableauCard,
 } from "../utils/tableau-ops.js";
 
 export const moveTableauCardToTableau: MoveHandler<
-  [TableauIndex, TableauIndex]
-> = (state, from, to) => {
+  [TableauIndex, TableauIndex, number?]
+> = (state, from, to, count = 1) => {
   if (from === to) {
     return state;
   }
 
   const sourcePile = state.tableau[from];
-  const cardToMove = peekTopCard(sourcePile);
-
-  if (!cardToMove || !cardToMove.faceUp) {
-    return state;
-  }
-
   const targetPile = state.tableau[to];
 
-  if (!canMoveCardToTableau(cardToMove, targetPile)) {
+  if (!canMoveTableauRunToTableau(sourcePile, targetPile, count)) {
     return state;
   }
 
-  removeTopCardAndFlipNext(sourcePile);
-  addCardToTableau(targetPile, cardToMove);
+  const movingCards = removeTableauRun(sourcePile, count);
+  revealTopTableauCard(sourcePile);
+  addCardsToTableau(targetPile, movingCards);
 
   return state;
 };

@@ -24,6 +24,23 @@ export const canMoveCardToTableau = (
   );
 };
 
+export const canMoveTableauRunToTableau = (
+  sourcePile: TableauPile,
+  targetPile: TableauPile,
+  count: number,
+): boolean => {
+  if (!isValidTableauRunCount(sourcePile, count)) {
+    return false;
+  }
+
+  const firstMovingCard = sourcePile[sourcePile.length - count];
+
+  return (
+    !!firstMovingCard?.faceUp &&
+    canMoveCardToTableau(firstMovingCard, targetPile)
+  );
+};
+
 export const addCardToTableau = (
   tableauPile: TableauPile,
   card: Card,
@@ -31,3 +48,32 @@ export const addCardToTableau = (
   card.faceUp = true;
   addCardToTop(tableauPile, card);
 };
+
+export const addCardsToTableau = (
+  tableauPile: TableauPile,
+  cards: TableauPile,
+): void => {
+  tableauPile.push(...cards);
+};
+
+export const removeTableauRun = (
+  tableauPile: TableauPile,
+  count: number,
+): TableauPile => {
+  return tableauPile.splice(tableauPile.length - count);
+};
+
+export const revealTopTableauCard = (tableauPile: TableauPile): void => {
+  const topCard = peekTopCard(tableauPile);
+
+  if (!topCard || topCard.faceUp) {
+    return;
+  }
+
+  topCard.faceUp = true;
+};
+
+const isValidTableauRunCount = (
+  tableauPile: TableauPile,
+  count: number,
+): boolean => count >= 1 && tableauPile.length >= count;

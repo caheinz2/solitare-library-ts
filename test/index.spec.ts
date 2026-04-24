@@ -529,6 +529,174 @@ describe("Game actions", () => {
       ]);
     });
 
+    it("moves a counted run from one tableau pile to another", () => {
+      const game = createGameFromState({
+        stock: [],
+        waste: [],
+        foundations: createEmptyFoundations(),
+        tableau: [
+          [
+            createCard("9", "spades", false),
+            createCard("7", "clubs"),
+            createCard("6", "hearts"),
+            createCard("5", "clubs"),
+          ],
+          [createCard("8", "diamonds")],
+          [],
+          [],
+          [],
+          [],
+          [],
+        ],
+      });
+
+      game.moveTableauToTableau(0, 1, 3);
+
+      expect(game.tableau[0]).toEqual([createCard("9", "spades")]);
+      expect(game.tableau[1]).toEqual([
+        createCard("8", "diamonds"),
+        createCard("7", "clubs"),
+        createCard("6", "hearts"),
+        createCard("5", "clubs"),
+      ]);
+    });
+
+    it("only flips the newly exposed top card when face-down cards remain", () => {
+      const game = createGameFromState({
+        stock: [],
+        waste: [],
+        foundations: createEmptyFoundations(),
+        tableau: [
+          [
+            createCard("10", "hearts", false),
+            createCard("9", "spades", false),
+            createCard("7", "clubs"),
+            createCard("6", "hearts"),
+            createCard("5", "clubs"),
+          ],
+          [createCard("8", "diamonds")],
+          [],
+          [],
+          [],
+          [],
+          [],
+        ],
+      });
+
+      game.moveTableauToTableau(0, 1, 3);
+
+      expect(game.tableau[0]).toEqual([
+        createCard("10", "hearts", false),
+        createCard("9", "spades"),
+      ]);
+      expect(game.tableau[1]).toEqual([
+        createCard("8", "diamonds"),
+        createCard("7", "clubs"),
+        createCard("6", "hearts"),
+        createCard("5", "clubs"),
+      ]);
+    });
+
+    it("does not reveal a face-down card when a face-up card remains on top", () => {
+      const game = createGameFromState({
+        stock: [],
+        waste: [],
+        foundations: createEmptyFoundations(),
+        tableau: [
+          [
+            createCard("10", "hearts", false),
+            createCard("8", "hearts"),
+            createCard("7", "clubs"),
+            createCard("6", "hearts"),
+          ],
+          [createCard("8", "diamonds")],
+          [],
+          [],
+          [],
+          [],
+          [],
+        ],
+      });
+
+      game.moveTableauToTableau(0, 1, 2);
+
+      expect(game.tableau[0]).toEqual([
+        createCard("10", "hearts", false),
+        createCard("8", "hearts"),
+      ]);
+      expect(game.tableau[1]).toEqual([
+        createCard("8", "diamonds"),
+        createCard("7", "clubs"),
+        createCard("6", "hearts"),
+      ]);
+    });
+
+    it("does not move cards when the count is zero", () => {
+      const game = createGameFromState({
+        stock: [],
+        waste: [],
+        foundations: createEmptyFoundations(),
+        tableau: [
+          [createCard("6", "hearts")],
+          [createCard("7", "clubs")],
+          [],
+          [],
+          [],
+          [],
+          [],
+        ],
+      });
+      const beforeState = getStateSnapshot(game);
+
+      game.moveTableauToTableau(0, 1, 0);
+
+      expect(getStateSnapshot(game)).toEqual(beforeState);
+    });
+
+    it("does not move cards when the count exceeds the source pile size", () => {
+      const game = createGameFromState({
+        stock: [],
+        waste: [],
+        foundations: createEmptyFoundations(),
+        tableau: [
+          [createCard("6", "hearts")],
+          [createCard("7", "clubs")],
+          [],
+          [],
+          [],
+          [],
+          [],
+        ],
+      });
+      const beforeState = getStateSnapshot(game);
+
+      game.moveTableauToTableau(0, 1, 2);
+
+      expect(getStateSnapshot(game)).toEqual(beforeState);
+    });
+
+    it("does not move a counted run when the first moving card is face down", () => {
+      const game = createGameFromState({
+        stock: [],
+        waste: [],
+        foundations: createEmptyFoundations(),
+        tableau: [
+          [createCard("7", "clubs", false), createCard("6", "hearts")],
+          [createCard("8", "diamonds")],
+          [],
+          [],
+          [],
+          [],
+          [],
+        ],
+      });
+      const beforeState = getStateSnapshot(game);
+
+      game.moveTableauToTableau(0, 1, 2);
+
+      expect(getStateSnapshot(game)).toEqual(beforeState);
+    });
+
     it("does not move a card when the source tableau pile is empty", () => {
       const game = createGameFromState({
         stock: [],

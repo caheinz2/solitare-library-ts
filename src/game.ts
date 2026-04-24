@@ -103,8 +103,12 @@ export class Game {
   }
 
   // Moves the top card from one tableau pile to another.
-  public moveTableauToTableau(from: TableauIndex, to: TableauIndex): Game {
-    this.gameState = moveTableauCardToTableau(this.gameState, from, to);
+  public moveTableauToTableau(
+    from: TableauIndex,
+    to: TableauIndex,
+    count = 1,
+  ): Game {
+    this.gameState = moveTableauCardToTableau(this.gameState, from, to, count);
     return this;
   }
 
