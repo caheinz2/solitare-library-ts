@@ -1,7 +1,12 @@
 import type { Card } from "../types/cards.js";
 import type { Foundation, Foundations } from "../types/state.js";
 import { isAce, isNextHighestRank, isSameSuit } from "./card-ops.js";
-import { addCardToTop, copyStack, peekTopCard } from "./stack-ops.js";
+import {
+  addCardToTop,
+  copyStack,
+  peekTopCard,
+  removeTopCard,
+} from "./stack-ops.js";
 
 export const canMoveCardToFoundation = (
   card: Card,
@@ -26,6 +31,18 @@ export const addCardToFoundation = (
   card.faceUp = true;
   foundation.suit ??= card.suit;
   addCardToTop(foundation.cards, card);
+};
+
+export const removeTopCardFromFoundation = (
+  foundation: Foundation,
+): Card | undefined => {
+  const removedCard = removeTopCard(foundation.cards);
+
+  if (foundation.cards.length === 0) {
+    foundation.suit = null;
+  }
+
+  return removedCard;
 };
 
 export const copyFoundation = (foundation: Foundation): Foundation => ({

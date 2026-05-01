@@ -10,6 +10,7 @@ import type {
 import { createOrderedDeck, shuffleDeck } from "./deck.js";
 import { dealInitialState } from "./moves/deal-initial-state.js";
 import { drawCards } from "./moves/draw-cards.js";
+import { moveFoundationCardToTableau } from "./moves/move-foundation-to-tableau.js";
 import { moveTableauCardToFoundation } from "./moves/move-tableau-to-foundation.js";
 import { moveTableauCardsToTableau } from "./moves/move-tableau-to-tableau.js";
 import { moveWasteCardToFoundation } from "./moves/move-waste-to-foundation.js";
@@ -99,6 +100,19 @@ export class Game {
   // Moves the top waste card to a foundation pile.
   public moveWasteToFoundation(foundationIndex: FoundationIndex): Game {
     this.gameState = moveWasteCardToFoundation(this.gameState, foundationIndex);
+    return this;
+  }
+
+  // Moves the top foundation card to a tableau pile.
+  public moveFoundationToTableau(
+    foundationIndex: FoundationIndex,
+    tableauIndex: TableauIndex,
+  ): Game {
+    this.gameState = moveFoundationCardToTableau(
+      this.gameState,
+      foundationIndex,
+      tableauIndex,
+    );
     return this;
   }
 
