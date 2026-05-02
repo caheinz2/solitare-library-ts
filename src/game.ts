@@ -11,7 +11,7 @@ import { createOrderedDeck, shuffleDeck } from "./deck.js";
 import { dealInitialState } from "./moves/deal-initial-state.js";
 import { drawCards } from "./moves/draw-cards.js";
 import { moveTableauCardToFoundation } from "./moves/move-tableau-to-foundation.js";
-import { moveTableauCardToTableau } from "./moves/move-tableau-to-tableau.js";
+import { moveTableauCardsToTableau } from "./moves/move-tableau-to-tableau.js";
 import { moveWasteCardToFoundation } from "./moves/move-waste-to-foundation.js";
 import { moveWasteCardToTableau } from "./moves/move-waste-to-tableau.js";
 import { copyFoundation } from "./utils/foundation-ops.js";
@@ -108,7 +108,7 @@ export class Game {
     to: TableauIndex,
     count = 1,
   ): Game {
-    this.gameState = moveTableauCardToTableau(this.gameState, from, to, count);
+    this.gameState = moveTableauCardsToTableau(this.gameState, from, to, count);
     return this;
   }
 

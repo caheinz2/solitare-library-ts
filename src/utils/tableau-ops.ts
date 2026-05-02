@@ -1,10 +1,6 @@
 import type { Card } from "../types/cards.js";
 import type { TableauPile } from "../types/state.js";
-import {
-  isKing,
-  isNextHighestRank,
-  isOppositeColor,
-} from "./card-ops.js";
+import { isKing, isNextHighestRank, isOppositeColor } from "./card-ops.js";
 import { addCardToTop, peekTopCard } from "./stack-ops.js";
 
 export const canMoveCardToTableau = (
@@ -17,8 +13,11 @@ export const canMoveCardToTableau = (
     return isKing(card);
   }
 
+  if (!topTableauCard.faceUp) {
+    return false;
+  }
+
   return (
-    topTableauCard.faceUp &&
     isOppositeColor(card, topTableauCard) &&
     isNextHighestRank(card, topTableauCard)
   );
@@ -66,7 +65,7 @@ export const removeTableauRun = (
 export const revealTopTableauCard = (tableauPile: TableauPile): void => {
   const topCard = peekTopCard(tableauPile);
 
-  if (!topCard || topCard.faceUp) {
+  if (!topCard) {
     return;
   }
 

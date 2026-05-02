@@ -7,7 +7,7 @@ import {
   revealTopTableauCard,
 } from "../utils/tableau-ops.js";
 
-export const moveTableauCardToTableau: MoveHandler<
+export const moveTableauCardsToTableau: MoveHandler<
   [TableauIndex, TableauIndex, number?]
 > = (state, from, to, count = 1) => {
   if (from === to) {
