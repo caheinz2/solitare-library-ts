@@ -1,6 +1,6 @@
-import type { Card } from "../src/index.js";
+import type { Card, GameState } from "../src/index.js";
 import { Game } from "../src/index.js";
-import { getCardKey } from "./test-setup.js";
+import { getCardKey, getStateSnapshot } from "./test-setup.js";
 
 const getAllCards = (game: Game): Card[] => [
   ...game.stock,
@@ -35,4 +35,11 @@ export const expectAllCardsFaceDirection = (
   cards.forEach((card) => {
     expect(card.faceUp).toBe(expectedFaceUp);
   });
+};
+
+export const expectGameStateToEqual = (
+  game: Game,
+  expectedState: GameState,
+): void => {
+  expect(getStateSnapshot(game)).toEqual(expectedState);
 };

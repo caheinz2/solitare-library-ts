@@ -1,21 +1,21 @@
 import { Game } from "../../src/index.js";
-import { expectConservedUniqueDeck } from "../test-assertions.js";
+import {
+  expectConservedUniqueDeck,
+  expectGameStateToEqual,
+} from "../test-assertions.js";
 import {
   createCard,
-  createEmptyFoundations,
-  createEmptyTableau,
   createFoundation,
-  createGameFromState,
+  createFoundations,
+  createGameWithNoState,
+  createGameWithState,
   getStateSnapshot,
 } from "../test-setup.js";
 
 describe("moveWasteToFoundation", () => {
   it("moves an ace from waste to an empty foundation", () => {
-    const game = createGameFromState({
-      stock: [],
+    const game = createGameWithState({
       waste: [createCard("A", "clubs")],
-      foundations: createEmptyFoundations(),
-      tableau: createEmptyTableau(),
     });
 
     game.moveWasteToFoundation(0);
@@ -27,16 +27,11 @@ describe("moveWasteToFoundation", () => {
   });
 
   it("moves the next same-suit rank from waste to foundation", () => {
-    const game = createGameFromState({
-      stock: [],
+    const game = createGameWithState({
       waste: [createCard("2", "clubs")],
-      foundations: [
-        createFoundation("clubs", [createCard("A", "clubs")]),
-        createFoundation(),
-        createFoundation(),
-        createFoundation(),
-      ],
-      tableau: createEmptyTableau(),
+      foundations: createFoundations({
+        0: createFoundation("clubs", [createCard("A", "clubs")]),
+      }),
     });
 
     game.moveWasteToFoundation(0);
@@ -51,69 +46,55 @@ describe("moveWasteToFoundation", () => {
   });
 
   it("does not move card when waste is empty", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [],
-      foundations: createEmptyFoundations(),
-      tableau: createEmptyTableau(),
-    });
+    const game = createGameWithNoState();
+
     const beforeState = getStateSnapshot(game);
 
     game.moveWasteToFoundation(0);
 
-    expect(getStateSnapshot(game)).toEqual(beforeState);
+    expectGameStateToEqual(game, beforeState);
   });
 
   it("does not move card when moving a non-ace to an empty foundation", () => {
-    const game = createGameFromState({
-      stock: [],
+    const game = createGameWithState({
       waste: [createCard("2", "clubs")],
-      foundations: createEmptyFoundations(),
-      tableau: createEmptyTableau(),
     });
+
     const beforeState = getStateSnapshot(game);
 
     game.moveWasteToFoundation(0);
 
-    expect(getStateSnapshot(game)).toEqual(beforeState);
+    expectGameStateToEqual(game, beforeState);
   });
 
   it("does not move card when the card suit does not match", () => {
-    const game = createGameFromState({
-      stock: [],
+    const game = createGameWithState({
       waste: [createCard("2", "hearts")],
-      foundations: [
-        createFoundation("clubs", [createCard("A", "clubs")]),
-        createFoundation(),
-        createFoundation(),
-        createFoundation(),
-      ],
-      tableau: createEmptyTableau(),
+      foundations: createFoundations({
+        0: createFoundation("clubs", [createCard("A", "clubs")]),
+      }),
     });
+
     const beforeState = getStateSnapshot(game);
 
     game.moveWasteToFoundation(0);
 
-    expect(getStateSnapshot(game)).toEqual(beforeState);
+    expectGameStateToEqual(game, beforeState);
   });
 
   it("does not move card when the card rank skips the next foundation rank", () => {
-    const game = createGameFromState({
-      stock: [],
+    const game = createGameWithState({
       waste: [createCard("3", "clubs")],
-      foundations: [
-        createFoundation("clubs", [createCard("A", "clubs")]),
-        createFoundation(),
-        createFoundation(),
-        createFoundation(),
-      ],
-      tableau: createEmptyTableau(),
+      foundations: createFoundations({
+        0: createFoundation("clubs", [createCard("A", "clubs")]),
+      }),
     });
+
     const beforeState = getStateSnapshot(game);
 
     game.moveWasteToFoundation(0);
 
-    expect(getStateSnapshot(game)).toEqual(beforeState);
+    expectGameStateToEqual(game, beforeState);
   });
 
   it("preserves all 52 unique cards after a valid waste-to-foundation move", () => {

@@ -1,21 +1,22 @@
 import { Game } from "../../src/index.js";
-import { expectConservedUniqueDeck } from "../test-assertions.js";
+import {
+  expectConservedUniqueDeck,
+  expectGameStateToEqual,
+} from "../test-assertions.js";
 import {
   createCard,
-  createEmptyFoundations,
-  createEmptyTableau,
   createFoundation,
-  createGameFromState,
+  createFoundations,
+  createGameWithNoState,
+  createGameWithState,
+  createTableau,
   getStateSnapshot,
 } from "../test-setup.js";
 
 describe("moveTableauToFoundation", () => {
   it("moves an ace from tableau to an empty foundation", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [],
-      foundations: createEmptyFoundations(),
-      tableau: [[createCard("A", "hearts")], [], [], [], [], [], []],
+    const game = createGameWithState({
+      tableau: createTableau({ 0: [createCard("A", "hearts")] }),
     });
 
     game.moveTableauToFoundation(0, 0);
@@ -27,16 +28,11 @@ describe("moveTableauToFoundation", () => {
   });
 
   it("moves the next same-suit rank from tableau to foundation", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [],
-      foundations: [
-        createFoundation("hearts", [createCard("A", "hearts")]),
-        createFoundation(),
-        createFoundation(),
-        createFoundation(),
-      ],
-      tableau: [[createCard("2", "hearts")], [], [], [], [], [], []],
+    const game = createGameWithState({
+      foundations: createFoundations({
+        0: createFoundation("hearts", [createCard("A", "hearts")]),
+      }),
+      tableau: createTableau({ 0: [createCard("2", "hearts")] }),
     });
 
     game.moveTableauToFoundation(0, 0);
@@ -51,85 +47,62 @@ describe("moveTableauToFoundation", () => {
   });
 
   it("does not move card when the tableau pile is empty", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [],
-      foundations: createEmptyFoundations(),
-      tableau: createEmptyTableau(),
-    });
+    const game = createGameWithNoState();
+
     const beforeState = getStateSnapshot(game);
 
     game.moveTableauToFoundation(0, 0);
 
-    expect(getStateSnapshot(game)).toEqual(beforeState);
+    expectGameStateToEqual(game, beforeState);
   });
 
   it("does not move card when the tableau top card is face down", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [],
-      foundations: createEmptyFoundations(),
-      tableau: [[createCard("A", "hearts", false)], [], [], [], [], [], []],
+    const game = createGameWithState({
+      tableau: createTableau({ 0: [createCard("A", "hearts", false)] }),
     });
+
     const beforeState = getStateSnapshot(game);
 
     game.moveTableauToFoundation(0, 0);
 
-    expect(getStateSnapshot(game)).toEqual(beforeState);
+    expectGameStateToEqual(game, beforeState);
   });
 
   it("does not move card when the card suit does not match", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [],
-      foundations: [
-        createFoundation("clubs", [createCard("A", "clubs")]),
-        createFoundation(),
-        createFoundation(),
-        createFoundation(),
-      ],
-      tableau: [[createCard("2", "hearts")], [], [], [], [], [], []],
+    const game = createGameWithState({
+      foundations: createFoundations({
+        0: createFoundation("clubs", [createCard("A", "clubs")]),
+      }),
+      tableau: createTableau({ 0: [createCard("2", "hearts")] }),
     });
+
     const beforeState = getStateSnapshot(game);
 
     game.moveTableauToFoundation(0, 0);
 
-    expect(getStateSnapshot(game)).toEqual(beforeState);
+    expectGameStateToEqual(game, beforeState);
   });
 
   it("does not move card when the card rank skips the next foundation rank", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [],
-      foundations: [
-        createFoundation("hearts", [createCard("A", "hearts")]),
-        createFoundation(),
-        createFoundation(),
-        createFoundation(),
-      ],
-      tableau: [[createCard("3", "hearts")], [], [], [], [], [], []],
+    const game = createGameWithState({
+      foundations: createFoundations({
+        0: createFoundation("hearts", [createCard("A", "hearts")]),
+      }),
+      tableau: createTableau({ 0: [createCard("3", "hearts")] }),
     });
+
     const beforeState = getStateSnapshot(game);
 
     game.moveTableauToFoundation(0, 0);
 
-    expect(getStateSnapshot(game)).toEqual(beforeState);
+    expectGameStateToEqual(game, beforeState);
   });
 
   it("flips the newly exposed tableau top card after a successful move", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [],
-      foundations: createEmptyFoundations(),
-      tableau: [
-        [createCard("4", "clubs", false), createCard("A", "hearts")],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-      ],
+    const game = createGameWithState({
+      tableau: createTableau({
+        0: [createCard("4", "clubs", false), createCard("A", "hearts")],
+      }),
     });
 
     game.moveTableauToFoundation(0, 0);
@@ -141,19 +114,10 @@ describe("moveTableauToFoundation", () => {
   });
 
   it("does not flip the next tableau card after an invalid move", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [],
-      foundations: createEmptyFoundations(),
-      tableau: [
-        [createCard("4", "clubs", false), createCard("2", "hearts")],
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-      ],
+    const game = createGameWithState({
+      tableau: createTableau({
+        0: [createCard("4", "clubs", false), createCard("2", "hearts")],
+      }),
     });
 
     game.moveTableauToFoundation(0, 0);

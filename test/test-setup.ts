@@ -49,14 +49,43 @@ export const createFoundation = (
   cards,
 });
 
-export const createEmptyFoundations = (): Foundations => [
+const createEmptyFoundations = (): Foundations => [
   createFoundation(),
   createFoundation(),
   createFoundation(),
   createFoundation(),
 ];
 
-export const createEmptyTableau = (): Tableau => [[], [], [], [], [], [], []];
+export const createFoundations = (
+  foundations: Partial<Record<number, Foundation>>,
+): Foundations => {
+  const foundationSet = createEmptyFoundations();
+
+  Object.entries(foundations).forEach(([foundationIndex, foundation]) => {
+    const index = Number(foundationIndex);
+
+    if (
+      !Number.isInteger(index) ||
+      index < 0 ||
+      index >= foundationSet.length
+    ) {
+      throw new Error(`Invalid foundation index: ${foundationIndex}`);
+    }
+
+    if (!foundation) {
+      throw new Error(`Expected foundation for index: ${foundationIndex}`);
+    }
+
+    foundationSet[index] = {
+      suit: foundation.suit,
+      cards: [...foundation.cards],
+    };
+  });
+
+  return foundationSet;
+};
+
+const createEmptyTableau = (): Tableau => [[], [], [], [], [], [], []];
 
 const PrivateGameConstructor = Game as unknown as new (
   state: GameState,
@@ -64,4 +93,40 @@ const PrivateGameConstructor = Game as unknown as new (
 
 export const createGameFromState = (state: GameState): Game => {
   return new PrivateGameConstructor(state);
+};
+
+export const createTableau = (
+  piles: Partial<Record<number, Card[]>>,
+): Tableau => {
+  const tableau = createEmptyTableau();
+
+  Object.entries(piles).forEach(([pileIndex, cards]) => {
+    const index = Number(pileIndex);
+
+    if (!Number.isInteger(index) || index < 0 || index >= tableau.length) {
+      throw new Error(`Invalid tableau pile index: ${pileIndex}`);
+    }
+
+    if (!cards) {
+      throw new Error(`Expected cards for tableau pile index: ${pileIndex}`);
+    }
+
+    tableau[index] = [...cards];
+  });
+
+  return tableau;
+};
+
+export const createGameWithState = (state: Partial<GameState>): Game => {
+  return createGameFromState({
+    stock: [],
+    waste: [],
+    foundations: createEmptyFoundations(),
+    tableau: createEmptyTableau(),
+    ...state,
+  });
+};
+
+export const createGameWithNoState = (): Game => {
+  return createGameWithState({});
 };

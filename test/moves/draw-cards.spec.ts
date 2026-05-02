@@ -1,9 +1,10 @@
 import { Game } from "../../src/index.js";
-import { expectAllCardsFaceDirection } from "../test-assertions.js";
 import {
-  createEmptyFoundations,
-  createEmptyTableau,
-  createGameFromState,
+  expectAllCardsFaceDirection,
+  expectGameStateToEqual,
+} from "../test-assertions.js";
+import {
+  createGameWithNoState,
   getCardKey,
   getStateSnapshot,
 } from "../test-setup.js";
@@ -51,17 +52,13 @@ describe("drawCards", () => {
   });
 
   it("does not draw cards when both stock and waste are empty", () => {
-    const game = createGameFromState({
-      stock: [],
-      waste: [],
-      foundations: createEmptyFoundations(),
-      tableau: createEmptyTableau(),
-    });
+    const game = createGameWithNoState();
+
     const beforeState = getStateSnapshot(game);
 
     game.draw();
 
-    expect(getStateSnapshot(game)).toEqual(beforeState);
+    expectGameStateToEqual(game, beforeState);
   });
 
   it("mutates current game state", () => {
