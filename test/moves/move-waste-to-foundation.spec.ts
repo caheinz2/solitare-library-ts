@@ -9,8 +9,10 @@ import {
   createFoundations,
   createGameWithNoState,
   createGameWithState,
-  getStateSnapshot,
 } from "../test-setup.js";
+import {
+  getStateSnapshot,
+} from "../test-selectors.js";
 
 describe("moveWasteToFoundation", () => {
   it("moves an ace from waste to an empty foundation", () => {

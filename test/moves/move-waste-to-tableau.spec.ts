@@ -8,8 +8,10 @@ import {
   createGameWithNoState,
   createGameWithState,
   createTableau,
-  getStateSnapshot,
 } from "../test-setup.js";
+import {
+  getStateSnapshot,
+} from "../test-selectors.js";
 
 describe("moveWasteToTableau", () => {
   it("moves a king from waste to an empty tableau pile", () => {

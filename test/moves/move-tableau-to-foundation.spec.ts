@@ -10,8 +10,10 @@ import {
   createGameWithNoState,
   createGameWithState,
   createTableau,
-  getStateSnapshot,
 } from "../test-setup.js";
+import {
+  getStateSnapshot,
+} from "../test-selectors.js";
 
 describe("moveTableauToFoundation", () => {
   it("moves an ace from tableau to an empty foundation", () => {

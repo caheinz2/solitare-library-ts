@@ -7,8 +7,10 @@ import {
   createCard,
   createGameWithState,
   createTableau,
-  getStateSnapshot,
 } from "../test-setup.js";
+import {
+  getStateSnapshot,
+} from "../test-selectors.js";
 
 describe("moveTableauToTableau", () => {
   it("moves a king from one tableau pile to an empty tableau pile", () => {

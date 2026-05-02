@@ -1,6 +1,6 @@
 import type { Card, GameState } from "../src/index.js";
 import { Game } from "../src/index.js";
-import { getCardKey, getStateSnapshot } from "./test-setup.js";
+import { getCardKey, getStateSnapshot } from "./test-selectors.js";
 
 export const assertConservedUniqueDeck = (game: Game): void => {
   const allCards = getAllCards(game);

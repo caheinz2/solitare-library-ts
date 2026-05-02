@@ -3,7 +3,8 @@ import {
   assertAllCardsFaceDirection,
   assertConservedUniqueDeck,
 } from "./test-assertions.js";
-import { createSequenceRng, getStateSnapshot } from "./test-setup.js";
+import { getStateSnapshot } from "./test-selectors.js";
+import { createSequenceRng } from "./test-setup.js";
 
 describe("Game.create", () => {
   it("initializes tableau, stock, waste, and foundations with correct sizes", () => {

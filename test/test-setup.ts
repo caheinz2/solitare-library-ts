@@ -26,15 +26,6 @@ export const createSequenceRng = (
   };
 };
 
-export const getStateSnapshot = (game: Game): GameState => ({
-  stock: game.stock,
-  waste: game.waste,
-  foundations: game.foundations,
-  tableau: game.tableau,
-});
-
-export const getCardKey = (card: Card): string => `${card.suit}-${card.rank}`;
-
 export const createCard = (rank: Rank, suit: Suit, faceUp = true): Card => ({
   suit,
   rank,

@@ -5,9 +5,11 @@ import {
 } from "../test-assertions.js";
 import {
   createGameWithNoState,
+} from "../test-setup.js";
+import {
   getCardKey,
   getStateSnapshot,
-} from "../test-setup.js";
+} from "../test-selectors.js";
 
 describe("drawCards", () => {
   it("draws 3 cards from stock to waste and flips drawn cards face up", () => {
