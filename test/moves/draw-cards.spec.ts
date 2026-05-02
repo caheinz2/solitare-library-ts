@@ -1,7 +1,7 @@
 import { Game } from "../../src/index.js";
 import {
-  expectAllCardsFaceDirection,
-  expectGameStateToEqual,
+  assertAllCardsFaceDirection,
+  assertGameStateEquals,
 } from "../test-assertions.js";
 import {
   createGameWithNoState,
@@ -17,7 +17,7 @@ describe("drawCards", () => {
 
     expect(game.stock).toHaveLength(21);
     expect(game.waste).toHaveLength(3);
-    expectAllCardsFaceDirection(game.waste, "up");
+    assertAllCardsFaceDirection(game.waste, "up");
   });
 
   it("moves all stock cards to waste after 8 draws", () => {
@@ -47,8 +47,8 @@ describe("drawCards", () => {
     expect(game.stock).toHaveLength(21);
     expect(game.waste).toHaveLength(3);
     expect(recycledWasteKeys).toEqual(expectedWasteKeys);
-    expectAllCardsFaceDirection(game.waste, "up");
-    expectAllCardsFaceDirection(game.stock, "down");
+    assertAllCardsFaceDirection(game.waste, "up");
+    assertAllCardsFaceDirection(game.stock, "down");
   });
 
   it("does not draw cards when both stock and waste are empty", () => {
@@ -58,7 +58,7 @@ describe("drawCards", () => {
 
     game.draw();
 
-    expectGameStateToEqual(game, beforeState);
+    assertGameStateEquals(game, beforeState);
   });
 
   it("mutates current game state", () => {

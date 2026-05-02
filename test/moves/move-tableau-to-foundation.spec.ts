@@ -1,7 +1,7 @@
 import { Game } from "../../src/index.js";
 import {
-  expectConservedUniqueDeck,
-  expectGameStateToEqual,
+  assertConservedUniqueDeck,
+  assertGameStateEquals,
 } from "../test-assertions.js";
 import {
   createCard,
@@ -53,7 +53,7 @@ describe("moveTableauToFoundation", () => {
 
     game.moveTableauToFoundation(0, 0);
 
-    expectGameStateToEqual(game, beforeState);
+    assertGameStateEquals(game, beforeState);
   });
 
   it("does not move card when the tableau top card is face down", () => {
@@ -65,7 +65,7 @@ describe("moveTableauToFoundation", () => {
 
     game.moveTableauToFoundation(0, 0);
 
-    expectGameStateToEqual(game, beforeState);
+    assertGameStateEquals(game, beforeState);
   });
 
   it("does not move card when the card suit does not match", () => {
@@ -80,7 +80,7 @@ describe("moveTableauToFoundation", () => {
 
     game.moveTableauToFoundation(0, 0);
 
-    expectGameStateToEqual(game, beforeState);
+    assertGameStateEquals(game, beforeState);
   });
 
   it("does not move card when the card rank skips the next foundation rank", () => {
@@ -95,7 +95,7 @@ describe("moveTableauToFoundation", () => {
 
     game.moveTableauToFoundation(0, 0);
 
-    expectGameStateToEqual(game, beforeState);
+    assertGameStateEquals(game, beforeState);
   });
 
   it("flips the newly exposed tableau top card after a successful move", () => {
@@ -134,6 +134,6 @@ describe("moveTableauToFoundation", () => {
 
     game.moveTableauToFoundation(0, 0);
 
-    expectConservedUniqueDeck(game);
+    assertConservedUniqueDeck(game);
   });
 });

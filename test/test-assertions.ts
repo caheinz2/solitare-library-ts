@@ -18,7 +18,7 @@ const getAllCards = (game: Game): Card[] => [
   ...game.tableau[6],
 ];
 
-export const expectConservedUniqueDeck = (game: Game): void => {
+export const assertConservedUniqueDeck = (game: Game): void => {
   const allCards = getAllCards(game);
   const uniqueCardKeys = new Set(allCards.map(getCardKey));
 
@@ -26,7 +26,7 @@ export const expectConservedUniqueDeck = (game: Game): void => {
   expect(uniqueCardKeys.size).toBe(52);
 };
 
-export const expectAllCardsFaceDirection = (
+export const assertAllCardsFaceDirection = (
   cards: Card[],
   direction: "up" | "down",
 ): void => {
@@ -37,7 +37,7 @@ export const expectAllCardsFaceDirection = (
   });
 };
 
-export const expectGameStateToEqual = (
+export const assertGameStateEquals = (
   game: Game,
   expectedState: GameState,
 ): void => {

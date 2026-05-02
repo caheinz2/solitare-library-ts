@@ -1,7 +1,7 @@
 import { Game } from "../../src/index.js";
 import {
-  expectConservedUniqueDeck,
-  expectGameStateToEqual,
+  assertConservedUniqueDeck,
+  assertGameStateEquals,
 } from "../test-assertions.js";
 import {
   createCard,
@@ -52,7 +52,7 @@ describe("moveWasteToFoundation", () => {
 
     game.moveWasteToFoundation(0);
 
-    expectGameStateToEqual(game, beforeState);
+    assertGameStateEquals(game, beforeState);
   });
 
   it("does not move card when moving a non-ace to an empty foundation", () => {
@@ -64,7 +64,7 @@ describe("moveWasteToFoundation", () => {
 
     game.moveWasteToFoundation(0);
 
-    expectGameStateToEqual(game, beforeState);
+    assertGameStateEquals(game, beforeState);
   });
 
   it("does not move card when the card suit does not match", () => {
@@ -79,7 +79,7 @@ describe("moveWasteToFoundation", () => {
 
     game.moveWasteToFoundation(0);
 
-    expectGameStateToEqual(game, beforeState);
+    assertGameStateEquals(game, beforeState);
   });
 
   it("does not move card when the card rank skips the next foundation rank", () => {
@@ -94,7 +94,7 @@ describe("moveWasteToFoundation", () => {
 
     game.moveWasteToFoundation(0);
 
-    expectGameStateToEqual(game, beforeState);
+    assertGameStateEquals(game, beforeState);
   });
 
   it("preserves all 52 unique cards after a valid waste-to-foundation move", () => {
@@ -119,6 +119,6 @@ describe("moveWasteToFoundation", () => {
 
     game.moveWasteToFoundation(0);
 
-    expectConservedUniqueDeck(game);
+    assertConservedUniqueDeck(game);
   });
 });

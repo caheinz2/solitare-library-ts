@@ -1,7 +1,7 @@
 import { Game } from "../src/index.js";
 import {
-  expectAllCardsFaceDirection,
-  expectConservedUniqueDeck,
+  assertAllCardsFaceDirection,
+  assertConservedUniqueDeck,
 } from "./test-assertions.js";
 import { createSequenceRng, getStateSnapshot } from "./test-setup.js";
 
@@ -33,13 +33,13 @@ describe("Game.create", () => {
   it("keeps all stock cards face down", () => {
     const game = Game.create({ rng: () => 0.5 });
 
-    expectAllCardsFaceDirection(game.stock, "down");
+    assertAllCardsFaceDirection(game.stock, "down");
   });
 
   it("conserves all 52 unique cards across all piles", () => {
     const game = Game.create({ rng: () => 0.5 });
 
-    expectConservedUniqueDeck(game);
+    assertConservedUniqueDeck(game);
   });
 
   it("is deterministic with the same rng sequence", () => {
