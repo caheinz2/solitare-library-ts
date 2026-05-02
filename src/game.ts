@@ -11,7 +11,9 @@ import { createOrderedDeck, shuffleDeck } from "./deck.js";
 import { dealInitialState } from "./moves/deal-initial-state.js";
 import { drawCards } from "./moves/draw-cards.js";
 import { moveTableauCardToFoundation } from "./moves/move-tableau-to-foundation.js";
+import { moveTableauCardsToTableau } from "./moves/move-tableau-to-tableau.js";
 import { moveWasteCardToFoundation } from "./moves/move-waste-to-foundation.js";
+import { moveWasteCardToTableau } from "./moves/move-waste-to-tableau.js";
 import { copyFoundation } from "./utils/foundation-ops.js";
 import { copyStack } from "./utils/stack-ops.js";
 
@@ -89,8 +91,9 @@ export class Game {
   }
 
   // Moves the top waste card to a tableau pile.
-  public moveWasteToTableau(_tableauIndex: TableauIndex): Game {
-    throw new Error("Not implemented");
+  public moveWasteToTableau(tableauIndex: TableauIndex): Game {
+    this.gameState = moveWasteCardToTableau(this.gameState, tableauIndex);
+    return this;
   }
 
   // Moves the top waste card to a foundation pile.
@@ -100,8 +103,13 @@ export class Game {
   }
 
   // Moves the top card from one tableau pile to another.
-  public moveTableauToTableau(_from: TableauIndex, _to: TableauIndex): Game {
-    throw new Error("Not implemented");
+  public moveTableauToTableau(
+    from: TableauIndex,
+    to: TableauIndex,
+    count = 1,
+  ): Game {
+    this.gameState = moveTableauCardsToTableau(this.gameState, from, to, count);
+    return this;
   }
 
   // Moves the top card from a tableau pile to a foundation pile.

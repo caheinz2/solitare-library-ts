@@ -20,5 +20,14 @@ export const flipTopCardFaceUp = (stack: Stack<Card>): void => {
   topCard.faceUp = true;
 };
 
+export const removeTopCardAndFlipNext = (
+  stack: Stack<Card>,
+): Card | undefined => {
+  const removedCard = removeTopCard(stack);
+  flipTopCardFaceUp(stack);
+
+  return removedCard;
+};
+
 export const copyStack = (stack: Stack<Card>): Stack<Card> =>
   stack.map((card) => ({ ...card }));

@@ -5,9 +5,8 @@ import {
   canMoveCardToFoundation,
 } from "../utils/foundation-ops.js";
 import {
-  flipTopCardFaceUp,
   peekTopCard,
-  removeTopCard,
+  removeTopCardAndFlipNext,
 } from "../utils/stack-ops.js";
 
 export const moveTableauCardToFoundation: MoveHandler<
@@ -26,9 +25,8 @@ export const moveTableauCardToFoundation: MoveHandler<
     return state;
   }
 
-  removeTopCard(sourcePile);
+  removeTopCardAndFlipNext(sourcePile);
   addCardToFoundation(targetFoundation, cardToMove);
-  flipTopCardFaceUp(sourcePile);
 
   return state;
 };
