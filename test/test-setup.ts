@@ -49,13 +49,6 @@ export const createFoundation = (
   cards,
 });
 
-const createEmptyFoundations = (): Foundations => [
-  createFoundation(),
-  createFoundation(),
-  createFoundation(),
-  createFoundation(),
-];
-
 export const createFoundations = (
   foundations: Partial<Record<number, Foundation>>,
 ): Foundations => {
@@ -83,16 +76,6 @@ export const createFoundations = (
   });
 
   return foundationSet;
-};
-
-const createEmptyTableau = (): Tableau => [[], [], [], [], [], [], []];
-
-const PrivateGameConstructor = Game as unknown as new (
-  state: GameState,
-) => Game;
-
-export const createGameFromState = (state: GameState): Game => {
-  return new PrivateGameConstructor(state);
 };
 
 export const createTableau = (
@@ -129,4 +112,21 @@ export const createGameWithState = (state: Partial<GameState>): Game => {
 
 export const createGameWithNoState = (): Game => {
   return createGameWithState({});
+};
+
+const createEmptyFoundations = (): Foundations => [
+  createFoundation(),
+  createFoundation(),
+  createFoundation(),
+  createFoundation(),
+];
+
+const createEmptyTableau = (): Tableau => [[], [], [], [], [], [], []];
+
+const PrivateGameConstructor = Game as unknown as new (
+  state: GameState,
+) => Game;
+
+const createGameFromState = (state: GameState): Game => {
+  return new PrivateGameConstructor(state);
 };
