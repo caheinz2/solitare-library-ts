@@ -10,7 +10,15 @@ import type {
   Waste,
 } from "solitaire-library-ts";
 
-export type { Card, Foundation, Foundations, Rank, Suit, Tableau };
+export type {
+  Card,
+  Foundation,
+  Foundations,
+  Rank,
+  Suit,
+  Tableau,
+  TableauIndex,
+};
 
 export type GameView = Readonly<{
   stock: Stock;

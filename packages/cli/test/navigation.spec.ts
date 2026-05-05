@@ -1,0 +1,127 @@
+import {
+  getInitialCursor,
+  moveCursor,
+  normalizeCursor,
+} from "../src/navigation.js";
+import {
+  createCard,
+  createGameView,
+  createTableau,
+} from "./test-setup.js";
+
+describe("navigation", () => {
+  it("starts on the stock", () => {
+    expect(getInitialCursor()).toEqual({ area: "stock" });
+  });
+
+  it("moves across the header and clamps at both ends", () => {
+    const view = createGameView();
+
+    expect(moveCursor(view, { area: "stock" }, "left")).toEqual({
+      area: "stock",
+    });
+    expect(moveCursor(view, { area: "stock" }, "right")).toEqual({
+      area: "waste",
+    });
+    expect(moveCursor(view, { area: "foundation", foundationIndex: 3 }, "right"))
+      .toEqual({
+        area: "foundation",
+        foundationIndex: 3,
+      });
+  });
+
+  it("moves between header and tableau by nearest column", () => {
+    const view = createGameView({
+      tableau: createTableau({ 0: [], 2: [createCard("A", "clubs")] }),
+    });
+
+    expect(moveCursor(view, { area: "foundation", foundationIndex: 0 }, "down"))
+      .toEqual({
+        area: "tableau",
+        tableauIndex: 2,
+        cardIndex: 0,
+      });
+    expect(
+      moveCursor(
+        view,
+        { area: "tableau", tableauIndex: 0, cardIndex: null },
+        "up",
+      ),
+    ).toEqual({ area: "stock" });
+  });
+
+  it("moves left and right across tableau piles", () => {
+    const view = createGameView({
+      tableau: createTableau({
+        0: [createCard("K", "clubs")],
+        1: [createCard("Q", "hearts")],
+      }),
+    });
+
+    expect(
+      moveCursor(
+        view,
+        { area: "tableau", tableauIndex: 0, cardIndex: 0 },
+        "right",
+      ),
+    ).toEqual({ area: "tableau", tableauIndex: 1, cardIndex: 0 });
+    expect(
+      moveCursor(
+        view,
+        { area: "tableau", tableauIndex: 0, cardIndex: 0 },
+        "left",
+      ),
+    ).toEqual({ area: "tableau", tableauIndex: 0, cardIndex: 0 });
+  });
+
+  it("moves up and down within visible tableau cards", () => {
+    const view = createGameView({
+      tableau: createTableau({
+        0: [
+          createCard("9", "clubs", false),
+          createCard("8", "diamonds"),
+          createCard("7", "clubs"),
+        ],
+      }),
+    });
+
+    expect(
+      moveCursor(
+        view,
+        { area: "tableau", tableauIndex: 0, cardIndex: 2 },
+        "up",
+      ),
+    ).toEqual({ area: "tableau", tableauIndex: 0, cardIndex: 1 });
+    expect(
+      moveCursor(
+        view,
+        { area: "tableau", tableauIndex: 0, cardIndex: 1 },
+        "down",
+      ),
+    ).toEqual({ area: "tableau", tableauIndex: 0, cardIndex: 2 });
+  });
+
+  it("normalizes tableau cursors to selectable face-up cards or empty piles", () => {
+    const view = createGameView({
+      tableau: createTableau({
+        0: [createCard("9", "clubs", false), createCard("8", "diamonds")],
+        1: [createCard("7", "clubs", false)],
+      }),
+    });
+
+    expect(
+      normalizeCursor(view, {
+        area: "tableau",
+        tableauIndex: 0,
+        cardIndex: 0,
+      }),
+    ).toEqual({ area: "tableau", tableauIndex: 0, cardIndex: 1 });
+    expect(
+      normalizeCursor(view, {
+        area: "tableau",
+        tableauIndex: 1,
+        cardIndex: 0,
+      }),
+    ).toEqual({ area: "tableau", tableauIndex: 1, cardIndex: null });
+  });
+});
