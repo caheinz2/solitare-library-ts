@@ -2,11 +2,13 @@ import type {
   Card,
   Foundation,
   Foundations,
+  GameState,
   GameView,
   Rank,
   Suit,
   Tableau,
 } from "../src/types.js";
+import { Game } from "solitaire-library-ts";
 
 export const createCard = (rank: Rank, suit: Suit, faceUp = true): Card => ({
   rank,
@@ -61,3 +63,15 @@ export const createGameView = (
   isWon: false,
   ...overrides,
 });
+
+export const createGameWithState = (state: Partial<GameState>): Game => {
+  const GameConstructor = Game as unknown as new (state: GameState) => Game;
+
+  return new GameConstructor({
+    stock: [],
+    waste: [],
+    foundations: createFoundations(),
+    tableau: createTableau(),
+    ...state,
+  });
+};

@@ -2,6 +2,8 @@ import type {
   Card,
   Foundation,
   Foundations,
+  FoundationIndex,
+  GameState,
   Rank,
   Stock,
   Suit,
@@ -13,7 +15,9 @@ import type {
 export type {
   Card,
   Foundation,
+  FoundationIndex,
   Foundations,
+  GameState,
   Rank,
   Suit,
   Tableau,
@@ -38,7 +42,7 @@ export type WasteCursor = Readonly<{
 
 export type FoundationCursor = Readonly<{
   area: "foundation";
-  foundationIndex: 0 | 1 | 2 | 3;
+  foundationIndex: FoundationIndex;
 }>;
 
 export type TableauCursor = Readonly<{
@@ -59,7 +63,7 @@ export type Selection =
     }>
   | Readonly<{
       source: "foundation";
-      foundationIndex: 0 | 1 | 2 | 3;
+      foundationIndex: FoundationIndex;
     }>
   | Readonly<{
       source: "tableau";
