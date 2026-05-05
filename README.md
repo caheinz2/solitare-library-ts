@@ -1,9 +1,14 @@
 # solitaire-library-ts
 
-TypeScript library scaffolding for Solitaire (draw-3).
+TypeScript packages for Solitaire (draw-3).
+
+## Packages
+
+- `packages/core` - TypeScript library published as `solitaire-library-ts`
+- `packages/cli` - terminal app published as `solitaire-library-ts-cli`
 
 ## Scripts
 
-- `npm test` - run unit tests (Jest + ts-jest, ESM)
-- `npm run test:watch` - watch tests
-- `npm run build` - build to `dist/`
+- `npm test` - run workspace unit tests
+- `npm run test:watch` - watch core library tests
+- `npm run build` - build workspace packages
