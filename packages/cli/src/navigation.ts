@@ -85,6 +85,10 @@ const moveTableauCursor = (
         return getHeaderCursor(getNearestHeaderColumn(cursor.tableauIndex));
       }
 
+      if (!hasFaceUpCardAbove(view, cursor.tableauIndex, cursor.cardIndex)) {
+        return getHeaderCursor(getNearestHeaderColumn(cursor.tableauIndex));
+      }
+
       return normalizeCursor(view, {
         ...cursor,
         cardIndex: cursor.cardIndex - 1,
@@ -173,4 +177,20 @@ const normalizeTableauCardIndex = (
   }
 
   return null;
+};
+
+const hasFaceUpCardAbove = (
+  view: GameView,
+  tableauIndex: TableauIndex,
+  cardIndex: number,
+): boolean => {
+  const pile = view.tableau[tableauIndex]!;
+
+  for (let index = cardIndex - 1; index >= 0; index -= 1) {
+    if (pile[index]?.faceUp) {
+      return true;
+    }
+  }
+
+  return false;
 };

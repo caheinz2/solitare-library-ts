@@ -101,6 +101,26 @@ describe("navigation", () => {
     ).toEqual({ area: "tableau", tableauIndex: 0, cardIndex: 2 });
   });
 
+  it("moves from the first visible tableau card back to the header", () => {
+    const view = createGameView({
+      tableau: createTableau({
+        2: [
+          createCard("9", "clubs", false),
+          createCard("8", "diamonds"),
+          createCard("7", "clubs"),
+        ],
+      }),
+    });
+
+    expect(
+      moveCursor(
+        view,
+        { area: "tableau", tableauIndex: 2, cardIndex: 1 },
+        "up",
+      ),
+    ).toEqual({ area: "foundation", foundationIndex: 0 });
+  });
+
   it("normalizes tableau cursors to selectable face-up cards or empty piles", () => {
     const view = createGameView({
       tableau: createTableau({
