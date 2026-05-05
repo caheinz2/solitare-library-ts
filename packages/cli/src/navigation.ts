@@ -3,8 +3,60 @@ import type { Cursor, GameView, TableauIndex } from "./types.js";
 export type Direction = "up" | "down" | "left" | "right";
 
 type HeaderColumn = 0 | 1 | 2 | 3 | 4 | 5;
+type HeaderCursor = Exclude<Cursor, { area: "tableau" }>;
+type TableauCursor = Extract<Cursor, { area: "tableau" }>;
+
+export type NavigationState = Readonly<{
+  cursor: Cursor;
+  headerCursor: HeaderCursor;
+  tableauCursor: TableauCursor;
+}>;
 
 export const getInitialCursor = (): Cursor => ({ area: "stock" });
+
+export const getInitialNavigationState = (): NavigationState => ({
+  cursor: { area: "stock" },
+  headerCursor: { area: "stock" },
+  tableauCursor: {
+    area: "tableau",
+    tableauIndex: 0,
+    cardIndex: null,
+  },
+});
+
+export const moveNavigation = (
+  view: GameView,
+  navigation: NavigationState,
+  direction: Direction,
+): NavigationState => {
+  if (navigation.cursor.area !== "tableau") {
+    return moveHeaderNavigation(view, navigation, direction);
+  }
+
+  return moveTableauNavigation(view, navigation, direction);
+};
+
+export const syncNavigationCursor = (
+  view: GameView,
+  navigation: NavigationState,
+  cursor: Cursor,
+): NavigationState => {
+  const normalizedCursor = normalizeCursor(view, cursor);
+
+  if (normalizedCursor.area === "tableau") {
+    return {
+      ...navigation,
+      cursor: normalizedCursor,
+      tableauCursor: normalizedCursor,
+    };
+  }
+
+  return {
+    ...navigation,
+    cursor: normalizedCursor,
+    headerCursor: normalizedCursor,
+  };
+};
 
 export const moveCursor = (
   view: GameView,
@@ -35,7 +87,7 @@ export const normalizeCursor = (view: GameView, cursor: Cursor): Cursor => {
 
 const moveHeaderCursor = (
   view: GameView,
-  cursor: Exclude<Cursor, { area: "tableau" }>,
+  cursor: HeaderCursor,
   direction: Direction,
 ): Cursor => {
   const column = getHeaderColumn(cursor);
@@ -60,7 +112,7 @@ const moveHeaderCursor = (
 
 const moveTableauCursor = (
   view: GameView,
-  cursor: Extract<Cursor, { area: "tableau" }>,
+  cursor: TableauCursor,
   direction: Direction,
 ): Cursor => {
   switch (direction) {
@@ -106,7 +158,7 @@ const moveTableauCursor = (
 };
 
 const getHeaderColumn = (
-  cursor: Exclude<Cursor, { area: "tableau" }>,
+  cursor: HeaderCursor,
 ): HeaderColumn => {
   switch (cursor.area) {
     case "stock":
@@ -130,6 +182,63 @@ const getHeaderCursor = (column: HeaderColumn): Cursor => {
   return {
     area: "foundation",
     foundationIndex: (column - 2) as 0 | 1 | 2 | 3,
+  };
+};
+
+const moveHeaderNavigation = (
+  view: GameView,
+  navigation: NavigationState,
+  direction: Direction,
+): NavigationState => {
+  if (direction === "down") {
+    const tableauCursor = normalizeCursor(
+      view,
+      navigation.tableauCursor,
+    ) as TableauCursor;
+
+    return {
+      cursor: tableauCursor,
+      headerCursor: navigation.headerCursor,
+      tableauCursor,
+    };
+  }
+
+  const cursor = moveHeaderCursor(view, navigation.headerCursor, direction);
+
+  return {
+    ...navigation,
+    cursor,
+    headerCursor: cursor as HeaderCursor,
+  };
+};
+
+const moveTableauNavigation = (
+  view: GameView,
+  navigation: NavigationState,
+  direction: Direction,
+): NavigationState => {
+  const tableauCursor = navigation.cursor as TableauCursor;
+
+  if (direction === "up" && shouldMoveToHeader(view, tableauCursor)) {
+    return {
+      ...navigation,
+      cursor: navigation.headerCursor,
+    };
+  }
+
+  const cursor = moveTableauCursor(view, tableauCursor, direction);
+
+  if (cursor.area !== "tableau") {
+    return {
+      ...navigation,
+      cursor: navigation.headerCursor,
+    };
+  }
+
+  return {
+    ...navigation,
+    cursor,
+    tableauCursor: cursor,
   };
 };
 
@@ -194,3 +303,7 @@ const hasFaceUpCardAbove = (
 
   return false;
 };
+
+const shouldMoveToHeader = (view: GameView, cursor: TableauCursor): boolean =>
+  cursor.cardIndex === null ||
+  !hasFaceUpCardAbove(view, cursor.tableauIndex, cursor.cardIndex);

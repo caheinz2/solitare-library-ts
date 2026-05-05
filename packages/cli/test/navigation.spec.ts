@@ -1,6 +1,8 @@
 import {
+  getInitialNavigationState,
   getInitialCursor,
   moveCursor,
+  moveNavigation,
   normalizeCursor,
 } from "../src/navigation.js";
 import {
@@ -143,5 +145,45 @@ describe("navigation", () => {
         cardIndex: 0,
       }),
     ).toEqual({ area: "tableau", tableauIndex: 1, cardIndex: null });
+  });
+
+  it("remembers header and tableau cursor positions independently", () => {
+    const view = createGameView({
+      tableau: createTableau({
+        0: [createCard("K", "clubs")],
+        4: [createCard("Q", "hearts")],
+      }),
+    });
+
+    let navigation = getInitialNavigationState();
+
+    navigation = moveNavigation(view, navigation, "down");
+    navigation = moveNavigation(view, navigation, "right");
+    navigation = moveNavigation(view, navigation, "right");
+    navigation = moveNavigation(view, navigation, "right");
+    navigation = moveNavigation(view, navigation, "right");
+
+    expect(navigation.cursor).toEqual({
+      area: "tableau",
+      tableauIndex: 4,
+      cardIndex: 0,
+    });
+
+    navigation = moveNavigation(view, navigation, "up");
+    navigation = moveNavigation(view, navigation, "right");
+
+    expect(navigation.cursor).toEqual({ area: "waste" });
+
+    navigation = moveNavigation(view, navigation, "down");
+
+    expect(navigation.cursor).toEqual({
+      area: "tableau",
+      tableauIndex: 4,
+      cardIndex: 0,
+    });
+
+    navigation = moveNavigation(view, navigation, "up");
+
+    expect(navigation.cursor).toEqual({ area: "waste" });
   });
 });

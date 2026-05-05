@@ -3,8 +3,12 @@ import readline from "node:readline";
 import { Game } from "solitaire-library-ts";
 import { handleCancel, handleEnter, getGameView } from "./actions.js";
 import type { CliState } from "./actions.js";
-import { getInitialCursor, moveCursor } from "./navigation.js";
-import type { Direction } from "./navigation.js";
+import {
+  getInitialNavigationState,
+  moveNavigation,
+  syncNavigationCursor,
+} from "./navigation.js";
+import type { Direction, NavigationState } from "./navigation.js";
 import { renderBoard } from "./renderer.js";
 
 type InputStream = NodeJS.ReadStream & {
@@ -36,9 +40,10 @@ export const runCli = ({
   }
 
   const game = rng ? Game.create({ rng }) : Game.create();
+  let navigation: NavigationState = getInitialNavigationState();
   let state: CliState = {
     game,
-    cursor: getInitialCursor(),
+    cursor: navigation.cursor,
     selection: null,
     status: "Ready.",
   };
@@ -75,9 +80,10 @@ export const runCli = ({
     }
 
     if (isDirection(key.name)) {
+      navigation = moveNavigation(getGameView(state.game), navigation, key.name);
       state = {
         ...state,
-        cursor: moveCursor(getGameView(state.game), state.cursor, key.name),
+        cursor: navigation.cursor,
       };
       render();
       return;
@@ -85,6 +91,11 @@ export const runCli = ({
 
     if (key.name === "return" || key.name === "enter") {
       state = handleEnter(state);
+      navigation = syncNavigationCursor(
+        getGameView(state.game),
+        navigation,
+        state.cursor,
+      );
       render();
       return;
     }
