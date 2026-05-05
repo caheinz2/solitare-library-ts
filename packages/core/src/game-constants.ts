@@ -22,3 +22,5 @@ export const RANKS: readonly Rank[] = [
 export const TABLEAU_INDICES: readonly TableauIndex[] = [0, 1, 2, 3, 4, 5, 6];
 
 export const DRAW_COUNT = 3;
+
+export const CARD_COUNT = 52;

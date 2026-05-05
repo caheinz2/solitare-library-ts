@@ -8,6 +8,7 @@ import type {
   Waste,
 } from "./types/state.js";
 import { createOrderedDeck, shuffleDeck } from "./deck.js";
+import { CARD_COUNT } from "./game-constants.js";
 import { dealInitialState } from "./moves/deal-initial-state.js";
 import { drawCards } from "./moves/draw-cards.js";
 import { moveFoundationCardToTableau } from "./moves/move-foundation-to-tableau.js";
@@ -70,6 +71,15 @@ export class Game {
       copyStack(sixth),
       copyStack(seventh),
     ];
+  }
+
+  public get isWon(): boolean {
+    const foundationCardCount = this.gameState.foundations.reduce(
+      (count, foundation) => count + foundation.cards.length,
+      0,
+    );
+
+    return foundationCardCount === CARD_COUNT;
   }
 
   public debugString(): string {

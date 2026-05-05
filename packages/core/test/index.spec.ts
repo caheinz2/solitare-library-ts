@@ -1,10 +1,15 @@
 import { Game } from "../src/index.js";
+import { createOrderedDeck } from "../src/deck.js";
 import {
   assertAllCardsFaceDirection,
   assertConservedUniqueDeck,
 } from "./test-assertions.js";
 import { getStateSnapshot } from "./test-selectors.js";
-import { createSequenceRng } from "./test-setup.js";
+import {
+  createFoundation,
+  createGameWithState,
+  createSequenceRng,
+} from "./test-setup.js";
 
 describe("Game.create", () => {
   it("initializes tableau, stock, waste, and foundations with correct sizes", () => {
@@ -96,6 +101,43 @@ describe("Game immutability", () => {
     expect(freshFoundation.suit).toBeNull();
     expect(freshFoundation.cards).toHaveLength(0);
     expect(afterState).toEqual(beforeState);
+  });
+});
+
+describe("Game win state", () => {
+  it("is not won for a newly created game", () => {
+    const game = Game.create({ rng: () => 0.5 });
+
+    expect(game.isWon).toBe(false);
+  });
+
+  it("is won when all cards are in foundations", () => {
+    const deck = createOrderedDeck().map((card) => ({ ...card, faceUp: true }));
+    const game = createGameWithState({
+      foundations: [
+        createFoundation("clubs", deck.slice(0, 13)),
+        createFoundation("diamonds", deck.slice(13, 26)),
+        createFoundation("hearts", deck.slice(26, 39)),
+        createFoundation("spades", deck.slice(39, 52)),
+      ],
+    });
+
+    expect(game.isWon).toBe(true);
+  });
+
+  it("is not won when fewer than 52 cards are in foundations", () => {
+    const deck = createOrderedDeck().map((card) => ({ ...card, faceUp: true }));
+    const game = createGameWithState({
+      foundations: [
+        createFoundation("clubs", deck.slice(0, 13)),
+        createFoundation("diamonds", deck.slice(13, 26)),
+        createFoundation("hearts", deck.slice(26, 39)),
+        createFoundation("spades", deck.slice(39, 51)),
+      ],
+      stock: [deck[51]!],
+    });
+
+    expect(game.isWon).toBe(false);
   });
 });
 
