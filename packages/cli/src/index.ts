@@ -1,3 +1,5 @@
 #!/usr/bin/env node
 
-export {};
+import { runCli } from "./app.js";
+
+runCli();
