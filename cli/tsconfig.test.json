@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "isolatedModules": true,
+    "rootDir": ".",
+    "noEmit": true
+  },
+  "include": ["src", "test"]
+}

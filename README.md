@@ -1,4 +1,4 @@
-# solitare-library-ts
+# solitaire-library-ts
 
 TypeScript library scaffolding for Solitaire (draw-3).
 

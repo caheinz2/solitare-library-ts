@@ -1,9 +1,12 @@
 {
-  "name": "solitare-library-ts",
+  "name": "solitaire-library-ts",
   "version": "0.1.0",
   "description": "TypeScript library for Solitaire (draw-3)",
   "type": "module",
   "private": true,
+  "workspaces": [
+    "cli"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
