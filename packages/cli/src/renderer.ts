@@ -1,4 +1,5 @@
-import type { Card, Cursor, GameView, Selection } from "./types.js";
+import type { Card } from "solitaire-library-ts";
+import type { Cursor, GameView, Selection } from "./types.js";
 
 export type RenderBoardOptions = Readonly<{
   view: GameView;

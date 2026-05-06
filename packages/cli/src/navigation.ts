@@ -1,4 +1,5 @@
-import type { Cursor, GameView, TableauIndex } from "./types.js";
+import type { TableauIndex } from "solitaire-library-ts";
+import type { Cursor, GameView } from "./types.js";
 
 export type Direction = "up" | "down" | "left" | "right";
 

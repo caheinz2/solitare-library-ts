@@ -3,12 +3,12 @@ import type {
   Foundation,
   Foundations,
   GameState,
-  GameView,
   Rank,
   Suit,
   Tableau,
-} from "../src/types.js";
+} from "solitaire-library-ts";
 import { Game } from "solitaire-library-ts";
+import type { GameView } from "../src/types.js";
 
 export const createCard = (rank: Rank, suit: Suit, faceUp = true): Card => ({
   rank,

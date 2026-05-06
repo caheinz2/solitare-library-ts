@@ -1,34 +1,10 @@
 import type {
-  Card,
-  Foundation,
-  Foundations,
   FoundationIndex,
   GameState,
-  Rank,
-  Stock,
-  Suit,
-  Tableau,
   TableauIndex,
-  Waste,
 } from "solitaire-library-ts";
 
-export type {
-  Card,
-  Foundation,
-  FoundationIndex,
-  Foundations,
-  GameState,
-  Rank,
-  Suit,
-  Tableau,
-  TableauIndex,
-};
-
-export type GameView = Readonly<{
-  stock: Stock;
-  waste: Waste;
-  foundations: Foundations;
-  tableau: Tableau;
+export type GameView = Readonly<GameState & {
   isWon: boolean;
 }>;
 

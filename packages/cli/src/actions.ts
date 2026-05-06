@@ -1,10 +1,12 @@
-import type { Game } from "solitaire-library-ts";
+import type {
+  FoundationIndex,
+  Game,
+  TableauIndex,
+} from "solitaire-library-ts";
 import type {
   Cursor,
-  FoundationIndex,
   GameView,
   Selection,
-  TableauIndex,
 } from "./types.js";
 import { normalizeCursor } from "./navigation.js";
 
