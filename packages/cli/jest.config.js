@@ -1,10 +1,8 @@
-/** @type {import('jest').Config} */
+import preset from "../../jest.preset.mjs";
+
+/** @type {import("jest").Config} */
 const config = {
-  preset: "ts-jest/presets/default-esm",
-  testEnvironment: "node",
-  extensionsToTreatAsEsm: [".ts"],
-  testMatch: ["**/test/**/*.spec.ts"],
-  watchman: false,
+  ...preset,
   transform: {
     "^.+\\.ts$": [
       "ts-jest",
@@ -13,9 +11,6 @@ const config = {
         tsconfig: "./tsconfig.test.json"
       }
     ]
-  },
-  moduleNameMapper: {
-    "^(\\.{1,2}/.*)\\.js$": "$1"
   }
 };
 
