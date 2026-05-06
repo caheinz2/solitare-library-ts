@@ -1,0 +1,23 @@
+{
+  "name": "solitaire-library-ts-cli",
+  "version": "0.1.0",
+  "description": "Terminal UI for solitaire-library-ts",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "solitaire": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest --config jest.config.js --passWithNoTests"
+  },
+  "dependencies": {
+    "solitaire-library-ts": "file:../core"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.3"
+  }
+}

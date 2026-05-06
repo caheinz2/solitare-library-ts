@@ -1,24 +1,15 @@
 {
-  "name": "solitare-library-ts",
+  "name": "solitaire-library-ts-workspace",
   "version": "0.1.0",
-  "description": "TypeScript library for Solitaire (draw-3)",
-  "type": "module",
+  "description": "Workspace for TypeScript Klondike Solitaire packages",
   "private": true,
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist"
+  "workspaces": [
+    "packages/*"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "test": "node --experimental-vm-modules ./node_modules/.bin/jest",
-    "test:watch": "node --experimental-vm-modules ./node_modules/.bin/jest --watch"
+    "build": "npm run build --workspace solitaire-library-ts && npm run build --workspace solitaire-library-ts-cli",
+    "test": "npm run test --workspaces",
+    "test:watch": "npm run test:watch --workspace solitaire-library-ts"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
