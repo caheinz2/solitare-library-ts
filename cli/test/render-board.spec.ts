@@ -55,4 +55,34 @@ describe("renderBoard", () => {
     expect(output).toContain("Stock: [ ] 0");
     expect(output).toContain("Waste: [ ] (0)");
   });
+
+  it("marks the cursor and selected source", () => {
+    const board: BoardView = {
+      stockCount: 24,
+      waste: [{ rank: "7", suit: "hearts", faceUp: true }],
+      foundations: [
+        { suit: null, cards: [] },
+        { suit: null, cards: [] },
+        { suit: null, cards: [] },
+        { suit: null, cards: [] },
+      ],
+      tableau: [
+        [{ rank: "K", suit: "hearts", faceUp: true }],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+      ],
+    };
+
+    const output = renderBoard(board, {
+      cursor: { kind: "tableau", tableauIndex: 0, cardIndex: 0 },
+      selection: { kind: "waste" },
+    });
+
+    expect(output).toContain("Waste: {7H} (1)");
+    expect(output).toContain(">KH<");
+  });
 });

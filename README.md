@@ -13,3 +13,4 @@ Workspace for a TypeScript Solitaire (draw-3) core library and CLI.
 - `npm run test:core` - run core unit tests
 - `npm run build` - build all workspaces
 - `npm run build:core` - build the core library
+- `npm run cli` - build and run the private terminal Solitaire app

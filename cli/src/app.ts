@@ -75,9 +75,13 @@ export class SolitaireCliApp {
   }
 
   private render(): void {
-    const board = renderBoard(this.getBoard());
+    const board = renderBoard(this.getBoard(), {
+      cursor: this.state.cursor,
+      selection: this.state.selection,
+    });
     const status = this.game.isWon ? "You won!" : this.state.status;
-    const footer = status ? `\n\n${status}` : "";
+    const help = "Arrows move | Enter selects/draws/moves | Esc clears | q quits";
+    const footer = status ? `\n\n${status}\n${help}` : `\n\n${help}`;
 
     this.sink.render(`${board}${footer}`);
   }
