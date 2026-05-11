@@ -36,21 +36,42 @@ export class SolitaireCliApp {
   }
 
   public handleKey(keyName: string): void {
-    if (keyName === "q" || keyName === "c" || keyName === "escape") {
-      if (keyName === "escape") {
-        this.applyCommand("escape");
-        return;
-      }
-
-      this.sink.exit();
-      return;
+    if (keyName === "escape") {
+      this.applyEscapeCommand();
+    } else if (keyName === "q" || keyName === "c") {
+      this.applyExitCommand();
+    } else if (keyName === "return" || keyName === "enter") {
+      this.applyEnterCommand();
+    } else {
+      this.applyMoveCursorCommand(keyName);
     }
+  }
 
-    if (keyName === "return" || keyName === "enter") {
-      this.applyCommand("enter");
-      return;
-    }
+  private applyEnterCommand(): void {
+    this.state = handleCommand(
+      "enter",
+      this.state,
+      this.getBoard(),
+      this.game,
+    );
+    this.render();
+  }
 
+  private applyEscapeCommand(): void {
+    this.state = handleCommand(
+      "escape",
+      this.state,
+      this.getBoard(),
+      this.game,
+    );
+    this.render();
+  }
+
+  private applyExitCommand(): void {
+    this.sink.exit();
+  }
+
+  private applyMoveCursorCommand(keyName: string): void {
     const direction = directionKeys[keyName];
 
     if (direction) {
@@ -60,16 +81,6 @@ export class SolitaireCliApp {
       };
       this.render();
     }
-  }
-
-  private applyCommand(command: "enter" | "escape"): void {
-    this.state = handleCommand(
-      command,
-      this.state,
-      this.getBoard(),
-      this.game,
-    );
-    this.render();
   }
 
   private render(): void {
