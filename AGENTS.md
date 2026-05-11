@@ -64,6 +64,20 @@ Use these names consistently:
 - Summarize what changed and why.
 - If assumptions are needed, state them explicitly.
 
+## Agent skills
+
+### Issue tracker
+
+Issues and PRDs are tracked in GitHub Issues for this repo. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Triage uses the default five-label vocabulary. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This repo uses a single-context domain docs layout. See `docs/agents/domain.md`.
+
 ## Non-goals (for now)
 - UI/visualization
 - Multiplayer/state sync
