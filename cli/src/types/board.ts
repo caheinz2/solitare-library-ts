@@ -3,8 +3,7 @@ import type {
   Tableau,
   Waste,
 } from "@caheinz2/solitaire-core";
-import type { Selection } from "./commands.js";
-import type { BoardCursor } from "./cursor.js";
+import type { BoardCursor, Selection } from "./interaction.js";
 
 export type BoardView = Readonly<{
   stockCount: number;
