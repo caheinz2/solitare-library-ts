@@ -1,7 +1,6 @@
-import type { Game } from "@caheinz2/solitaire-core";
-import type { BoardView } from "./types/index.js";
+import type { BoardView, PlayableGame } from "./types/index.js";
 
-export const createBoardView = (game: Game): BoardView => ({
+export const createBoardView = (game: PlayableGame): BoardView => ({
   stockCount: game.stock.length,
   waste: game.waste,
   foundations: game.foundations,

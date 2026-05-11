@@ -24,8 +24,6 @@ export type BoardView = Readonly<{
   tableau: Tableau;
 }>;
 
-export type BoardProvider = () => BoardView;
-
 export type RenderOptions = Readonly<{
   cursor?: BoardCursor;
   selection?: Selection | null;

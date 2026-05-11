@@ -1,13 +1,20 @@
 import { jest } from "@jest/globals";
 import { SolitaireCliApp } from "../src/app.js";
 import type {
-  BoardView,
   GameCommands,
+  PlayableGame,
   RenderSink,
 } from "../src/types/index.js";
 
-const board: BoardView = {
-  stockCount: 1,
+const createGame = (): jest.Mocked<GameCommands> & PlayableGame => ({
+  draw: jest.fn(),
+  moveWasteToTableau: jest.fn(),
+  moveWasteToFoundation: jest.fn(),
+  moveTableauToTableau: jest.fn(),
+  moveTableauToFoundation: jest.fn(),
+  moveFoundationToTableau: jest.fn(),
+  isWon: false,
+  stock: [{ rank: "A", suit: "clubs", faceUp: false }],
   waste: [],
   foundations: [
     { suit: null, cards: [] },
@@ -16,16 +23,6 @@ const board: BoardView = {
     { suit: null, cards: [] },
   ],
   tableau: [[], [], [], [], [], [], []],
-};
-
-const createGame = (): jest.Mocked<GameCommands> & { isWon: boolean } => ({
-  draw: jest.fn(),
-  moveWasteToTableau: jest.fn(),
-  moveWasteToFoundation: jest.fn(),
-  moveTableauToTableau: jest.fn(),
-  moveTableauToFoundation: jest.fn(),
-  moveFoundationToTableau: jest.fn(),
-  isWon: false,
 });
 
 const createSink = (): jest.Mocked<RenderSink> => ({
@@ -37,7 +34,7 @@ describe("SolitaireCliApp", () => {
   it("renders the initial board", () => {
     const sink = createSink();
 
-    new SolitaireCliApp(createGame(), () => board, sink).start();
+    new SolitaireCliApp(createGame(), sink).start();
 
     expect(sink.render).toHaveBeenCalledWith(expect.stringContaining("Stock:"));
   });
@@ -45,7 +42,7 @@ describe("SolitaireCliApp", () => {
   it("handles arrow keys and enter without a real TTY", () => {
     const game = createGame();
     const sink = createSink();
-    const app = new SolitaireCliApp(game, () => board, sink);
+    const app = new SolitaireCliApp(game, sink);
 
     app.handleKey("right");
     app.handleKey("left");
@@ -57,7 +54,7 @@ describe("SolitaireCliApp", () => {
 
   it("exits on q", () => {
     const sink = createSink();
-    const app = new SolitaireCliApp(createGame(), () => board, sink);
+    const app = new SolitaireCliApp(createGame(), sink);
 
     app.handleKey("q");
 

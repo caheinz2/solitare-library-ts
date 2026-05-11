@@ -1,9 +1,10 @@
-export type { AppState, RenderSink } from "./app.js";
-export type { BoardCursor, BoardProvider, BoardView, RenderOptions } from "./board.js";
+export type { BoardCursor, BoardView, RenderOptions } from "./board.js";
 export type {
+  AppState,
   Command,
   Direction,
   GameCommands,
   PlayableGame,
+  RenderSink,
   Selection,
 } from "./interaction.js";

@@ -1,9 +1,9 @@
 import { handleCommand } from "./commands.js";
 import { moveCursor } from "./cursor.js";
+import { createBoardView } from "./board-from-game.js";
 import { renderBoard } from "./render-board.js";
 import type {
   AppState,
-  BoardProvider,
   Direction,
   PlayableGame,
   RenderSink,
@@ -27,7 +27,6 @@ export class SolitaireCliApp {
 
   public constructor(
     private readonly game: PlayableGame,
-    private readonly getBoard: BoardProvider,
     private readonly sink: RenderSink,
   ) {}
 
@@ -51,7 +50,7 @@ export class SolitaireCliApp {
     this.state = handleCommand(
       "enter",
       this.state,
-      this.getBoard(),
+      createBoardView(this.game),
       this.game,
     );
     this.render();
@@ -61,7 +60,7 @@ export class SolitaireCliApp {
     this.state = handleCommand(
       "escape",
       this.state,
-      this.getBoard(),
+      createBoardView(this.game),
       this.game,
     );
     this.render();
@@ -77,14 +76,18 @@ export class SolitaireCliApp {
     if (direction) {
       this.state = {
         ...this.state,
-        cursor: moveCursor(this.state.cursor, direction, this.getBoard()),
+        cursor: moveCursor(
+          this.state.cursor,
+          direction,
+          createBoardView(this.game),
+        ),
       };
       this.render();
     }
   }
 
   private render(): void {
-    const board = renderBoard(this.getBoard(), {
+    const board = renderBoard(createBoardView(this.game), {
       cursor: this.state.cursor,
       selection: this.state.selection,
     });

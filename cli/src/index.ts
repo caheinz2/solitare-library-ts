@@ -2,12 +2,11 @@
 import { emitKeypressEvents } from "node:readline";
 import { Game } from "@caheinz2/solitaire-core";
 import { SolitaireCliApp } from "./app.js";
-import { createBoardView } from "./board-from-game.js";
 
 const clearScreen = "\x1b[2J\x1b[H";
 
 const game = Game.create();
-const app = new SolitaireCliApp(game, () => createBoardView(game), {
+const app = new SolitaireCliApp(game, {
   render(output) {
     process.stdout.write(`${clearScreen}${output}\n`);
   },
