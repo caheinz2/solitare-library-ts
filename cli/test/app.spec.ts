@@ -1,7 +1,10 @@
 import { jest } from "@jest/globals";
-import { SolitaireCliApp, type RenderSink } from "../src/app.js";
-import type { BoardView } from "../src/render-board.js";
-import type { GameCommands } from "../src/commands.js";
+import { SolitaireCliApp } from "../src/app.js";
+import type {
+  BoardView,
+  GameCommands,
+  RenderSink,
+} from "../src/types/index.js";
 
 const board: BoardView = {
   stockCount: 1,

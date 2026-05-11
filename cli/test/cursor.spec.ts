@@ -1,5 +1,5 @@
-import type { BoardView } from "../src/render-board.js";
-import { moveCursor, type BoardCursor } from "../src/cursor.js";
+import { moveCursor } from "../src/cursor.js";
+import type { BoardCursor, BoardView } from "../src/types/index.js";
 
 const emptyBoard: BoardView = {
   stockCount: 0,

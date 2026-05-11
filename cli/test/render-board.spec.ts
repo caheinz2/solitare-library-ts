@@ -1,4 +1,5 @@
-import { renderBoard, type BoardView } from "../src/render-board.js";
+import { renderBoard } from "../src/render-board.js";
+import type { BoardView } from "../src/types/index.js";
 
 describe("renderBoard", () => {
   it("renders stock, top waste, foundation tops, and tableau columns", () => {

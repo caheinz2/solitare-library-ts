@@ -1,10 +1,10 @@
 import { jest } from "@jest/globals";
-import {
-  handleCommand,
-  type AppState,
-  type GameCommands,
-} from "../src/commands.js";
-import type { BoardView } from "../src/render-board.js";
+import { handleCommand } from "../src/commands.js";
+import type {
+  AppState,
+  BoardView,
+  GameCommands,
+} from "../src/types/index.js";
 
 const board: BoardView = {
   stockCount: 24,

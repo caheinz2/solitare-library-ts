@@ -1,20 +1,5 @@
-import type {
-  FoundationIndex,
-  TableauIndex,
-} from "@caheinz2/solitaire-core";
-import type { BoardView } from "./render-board.js";
-
-export type Direction = "up" | "down" | "left" | "right";
-
-export type BoardCursor =
-  | Readonly<{ kind: "stock" }>
-  | Readonly<{ kind: "waste" }>
-  | Readonly<{ kind: "foundation"; foundationIndex: FoundationIndex }>
-  | Readonly<{
-      kind: "tableau";
-      tableauIndex: TableauIndex;
-      cardIndex: number | null;
-    }>;
+import type { TableauIndex } from "@caheinz2/solitaire-core";
+import type { BoardCursor, BoardView, Direction } from "./types/index.js";
 
 const topRow: ReadonlyArray<BoardCursor> = [
   { kind: "stock" },

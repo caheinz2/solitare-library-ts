@@ -1,15 +1,13 @@
-import { handleCommand, type AppState, type GameCommands } from "./commands.js";
-import { moveCursor, type Direction } from "./cursor.js";
-import { renderBoard, type BoardView } from "./render-board.js";
-
-export type PlayableGame = GameCommands & Readonly<{ isWon: boolean }>;
-
-export type RenderSink = {
-  render(output: string): void;
-  exit(): void;
-};
-
-export type BoardProvider = () => BoardView;
+import { handleCommand } from "./commands.js";
+import { moveCursor } from "./cursor.js";
+import { renderBoard } from "./render-board.js";
+import type {
+  AppState,
+  BoardProvider,
+  Direction,
+  PlayableGame,
+  RenderSink,
+} from "./types/index.js";
 
 const initialState: AppState = {
   cursor: { kind: "stock" },
