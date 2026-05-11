@@ -24,16 +24,5 @@ export type Selection =
   | Readonly<{ kind: "foundation"; foundationIndex: FoundationIndex }>
   | Readonly<{ kind: "tableau"; tableauIndex: TableauIndex; count: number }>;
 
-export type AppState = Readonly<{
-  cursor: BoardCursor;
-  selection: Selection | null;
-  status: string;
-}>;
-
 export type PlayableGame = GameCommands &
   Pick<Game, "isWon" | "stock" | "waste" | "foundations" | "tableau">;
-
-export type RenderSink = {
-  render(output: string): void;
-  exit(): void;
-};

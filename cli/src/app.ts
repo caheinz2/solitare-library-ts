@@ -4,6 +4,7 @@ import { createBoardView } from "./board-from-game.js";
 import { renderBoard } from "./render-board.js";
 import type {
   AppState,
+  BoardView,
   Direction,
   PlayableGame,
   RenderSink,
@@ -50,7 +51,7 @@ export class SolitaireCliApp {
     this.state = handleCommand(
       "enter",
       this.state,
-      createBoardView(this.game),
+      this.boardView,
       this.game,
     );
     this.render();
@@ -60,7 +61,7 @@ export class SolitaireCliApp {
     this.state = handleCommand(
       "escape",
       this.state,
-      createBoardView(this.game),
+      this.boardView,
       this.game,
     );
     this.render();
@@ -72,22 +73,24 @@ export class SolitaireCliApp {
 
   private applyMoveCursorCommand(keyName: string): void {
     const direction = directionKeys[keyName];
-
-    if (direction) {
-      this.state = {
-        ...this.state,
-        cursor: moveCursor(
-          this.state.cursor,
-          direction,
-          createBoardView(this.game),
-        ),
-      };
-      this.render();
+    if (!direction) {
+      return;
     }
+
+    this.state = {
+      ...this.state,
+      cursor: moveCursor(
+        this.state.cursor,
+        direction,
+        this.boardView,
+      ),
+    };
+
+    this.render();
   }
 
   private render(): void {
-    const board = renderBoard(createBoardView(this.game), {
+    const board = renderBoard(this.boardView, {
       cursor: this.state.cursor,
       selection: this.state.selection,
     });
@@ -96,5 +99,9 @@ export class SolitaireCliApp {
     const footer = status ? `\n\n${status}\n${help}` : `\n\n${help}`;
 
     this.sink.render(`${board}${footer}`);
+  }
+
+  private get boardView(): BoardView {
+    return createBoardView(this.game);
   }
 }
