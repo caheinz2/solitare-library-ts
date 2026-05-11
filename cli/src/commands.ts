@@ -1,5 +1,6 @@
 import type {
   FoundationIndex,
+  Game,
   TableauIndex,
 } from "@caheinz2/solitaire-core";
 import type { BoardCursor } from "./cursor.js";
@@ -7,24 +8,15 @@ import type { BoardView } from "./render-board.js";
 
 export type Command = "enter" | "escape";
 
-export type GameLike = {
-  draw(): unknown;
-  moveWasteToTableau(tableauIndex: TableauIndex): unknown;
-  moveWasteToFoundation(foundationIndex: FoundationIndex): unknown;
-  moveTableauToTableau(
-    from: TableauIndex,
-    to: TableauIndex,
-    count: number,
-  ): unknown;
-  moveTableauToFoundation(
-    tableauIndex: TableauIndex,
-    foundationIndex: FoundationIndex,
-  ): unknown;
-  moveFoundationToTableau(
-    foundationIndex: FoundationIndex,
-    tableauIndex: TableauIndex,
-  ): unknown;
-};
+export type GameCommands = Pick<
+  Game,
+  | "draw"
+  | "moveWasteToTableau"
+  | "moveWasteToFoundation"
+  | "moveTableauToTableau"
+  | "moveTableauToFoundation"
+  | "moveFoundationToTableau"
+>;
 
 export type Selection =
   | Readonly<{ kind: "waste" }>
@@ -76,7 +68,7 @@ const getSelection = (
 const moveSelectionToTarget = (
   selection: Selection,
   cursor: BoardCursor,
-  game: GameLike,
+  game: GameCommands,
 ): string => {
   if (cursor.kind === "tableau") {
     if (selection.kind === "waste") {
@@ -121,7 +113,7 @@ const moveSelectionToTarget = (
 const handleEnter = (
   state: AppState,
   board: BoardView,
-  game: GameLike,
+  game: GameCommands,
 ): AppState => {
   if (state.cursor.kind === "stock" && !state.selection) {
     game.draw();
@@ -145,7 +137,7 @@ export const handleCommand = (
   command: Command,
   state: AppState,
   board: BoardView,
-  game: GameLike,
+  game: GameCommands,
 ): AppState => {
   if (command === "escape") {
     return { ...state, selection: null, status: "Selection cleared." };

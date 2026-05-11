@@ -1,5 +1,9 @@
 import { jest } from "@jest/globals";
-import { handleCommand, type AppState, type GameLike } from "../src/commands.js";
+import {
+  handleCommand,
+  type AppState,
+  type GameCommands,
+} from "../src/commands.js";
 import type { BoardView } from "../src/render-board.js";
 
 const board: BoardView = {
@@ -26,7 +30,7 @@ const board: BoardView = {
   ],
 };
 
-const createGame = (): jest.Mocked<GameLike> => ({
+const createGame = (): jest.Mocked<GameCommands> => ({
   draw: jest.fn(),
   moveWasteToTableau: jest.fn(),
   moveWasteToFoundation: jest.fn(),

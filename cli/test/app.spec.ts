@@ -1,7 +1,7 @@
 import { jest } from "@jest/globals";
 import { SolitaireCliApp, type RenderSink } from "../src/app.js";
 import type { BoardView } from "../src/render-board.js";
-import type { GameLike } from "../src/commands.js";
+import type { GameCommands } from "../src/commands.js";
 
 const board: BoardView = {
   stockCount: 1,
@@ -15,7 +15,7 @@ const board: BoardView = {
   tableau: [[], [], [], [], [], [], []],
 };
 
-const createGame = (): jest.Mocked<GameLike> & { isWon: boolean } => ({
+const createGame = (): jest.Mocked<GameCommands> & { isWon: boolean } => ({
   draw: jest.fn(),
   moveWasteToTableau: jest.fn(),
   moveWasteToFoundation: jest.fn(),

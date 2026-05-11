@@ -1,8 +1,8 @@
-import { handleCommand, type AppState, type GameLike } from "./commands.js";
+import { handleCommand, type AppState, type GameCommands } from "./commands.js";
 import { moveCursor, type Direction } from "./cursor.js";
 import { renderBoard, type BoardView } from "./render-board.js";
 
-export type PlayableGame = GameLike & Readonly<{ isWon: boolean }>;
+export type PlayableGame = GameCommands & Readonly<{ isWon: boolean }>;
 
 export type RenderSink = {
   render(output: string): void;
