@@ -10,7 +10,10 @@
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "build:core": "npm --workspace @caheinz2/solitaire-core run build",
+    "build:cli": "npm --workspace @caheinz2/solitaire-cli run build",
+    "cli": "npm --workspace @caheinz2/solitaire-cli run start",
     "test": "npm run test --workspaces --if-present",
-    "test:core": "npm --workspace @caheinz2/solitaire-core run test"
+    "test:core": "npm --workspace @caheinz2/solitaire-core run test",
+    "test:cli": "npm --workspace @caheinz2/solitaire-cli run test"
   }
 }
