@@ -1,51 +1,18 @@
+import type {
+  Card,
+  Foundations,
+  Suit,
+  Tableau,
+  Waste,
+} from "@caheinz2/solitaire-core";
 import type { Selection } from "./commands.js";
 import type { BoardCursor } from "./cursor.js";
 
-export type CardSuit = "clubs" | "diamonds" | "hearts" | "spades";
-export type CardRank =
-  | "A"
-  | "2"
-  | "3"
-  | "4"
-  | "5"
-  | "6"
-  | "7"
-  | "8"
-  | "9"
-  | "10"
-  | "J"
-  | "Q"
-  | "K";
-
-export type CardView = Readonly<{
-  rank: CardRank;
-  suit: CardSuit;
-  faceUp: boolean;
-}>;
-
-export type FoundationView = Readonly<{
-  suit: CardSuit | null;
-  cards: ReadonlyArray<CardView>;
-}>;
-
 export type BoardView = Readonly<{
   stockCount: number;
-  waste: ReadonlyArray<CardView>;
-  foundations: readonly [
-    FoundationView,
-    FoundationView,
-    FoundationView,
-    FoundationView,
-  ];
-  tableau: readonly [
-    ReadonlyArray<CardView>,
-    ReadonlyArray<CardView>,
-    ReadonlyArray<CardView>,
-    ReadonlyArray<CardView>,
-    ReadonlyArray<CardView>,
-    ReadonlyArray<CardView>,
-    ReadonlyArray<CardView>,
-  ];
+  waste: Waste;
+  foundations: Foundations;
+  tableau: Tableau;
 }>;
 
 export type RenderOptions = Readonly<{
@@ -55,7 +22,7 @@ export type RenderOptions = Readonly<{
 
 const columnWidth = 10;
 
-const suitLabels: Record<CardSuit, string> = {
+const suitLabels: Record<Suit, string> = {
   clubs: "C",
   diamonds: "D",
   hearts: "H",
@@ -65,7 +32,7 @@ const suitLabels: Record<CardSuit, string> = {
 const topCard = <T>(cards: ReadonlyArray<T>): T | undefined =>
   cards[cards.length - 1];
 
-const renderCard = (card: CardView | undefined): string => {
+const renderCard = (card: Card | undefined): string => {
   if (!card) {
     return "[ ]";
   }
@@ -93,7 +60,7 @@ const renderStock = (
 };
 
 const renderWaste = (
-  waste: ReadonlyArray<CardView>,
+  waste: Waste,
   options: RenderOptions,
 ): string => {
   const wasteCard = markCursor(

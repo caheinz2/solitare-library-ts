@@ -1,3 +1,7 @@
+import type {
+  FoundationIndex,
+  TableauIndex,
+} from "@caheinz2/solitaire-core";
 import type { BoardView } from "./render-board.js";
 
 export type Direction = "up" | "down" | "left" | "right";
@@ -5,10 +9,10 @@ export type Direction = "up" | "down" | "left" | "right";
 export type BoardCursor =
   | Readonly<{ kind: "stock" }>
   | Readonly<{ kind: "waste" }>
-  | Readonly<{ kind: "foundation"; foundationIndex: number }>
+  | Readonly<{ kind: "foundation"; foundationIndex: FoundationIndex }>
   | Readonly<{
       kind: "tableau";
-      tableauIndex: number;
+      tableauIndex: TableauIndex;
       cardIndex: number | null;
     }>;
 
@@ -23,6 +27,9 @@ const topRow: ReadonlyArray<BoardCursor> = [
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(Math.max(value, min), max);
+
+const toTableauIndex = (value: number): TableauIndex =>
+  clamp(value, 0, 6) as TableauIndex;
 
 const topRowIndex = (cursor: BoardCursor): number => {
   if (cursor.kind === "stock") {
@@ -48,16 +55,17 @@ const tableauCursor = (
   tableauIndex: number,
   preferredCardIndex: number | null,
 ): BoardCursor => {
-  const pile = board.tableau[clamp(tableauIndex, 0, board.tableau.length - 1)];
+  const safeTableauIndex = toTableauIndex(tableauIndex);
+  const pile = board.tableau[safeTableauIndex];
 
   if (!pile) {
-    return { kind: "tableau", tableauIndex, cardIndex: null };
+    return { kind: "tableau", tableauIndex: safeTableauIndex, cardIndex: null };
   }
 
   if (preferredCardIndex !== null && pile[preferredCardIndex]?.faceUp) {
     return {
       kind: "tableau",
-      tableauIndex,
+      tableauIndex: safeTableauIndex,
       cardIndex: preferredCardIndex,
     };
   }
@@ -66,7 +74,7 @@ const tableauCursor = (
 
   return {
     kind: "tableau",
-    tableauIndex,
+    tableauIndex: safeTableauIndex,
     cardIndex: firstFaceUpIndex === -1 ? null : firstFaceUpIndex,
   };
 };

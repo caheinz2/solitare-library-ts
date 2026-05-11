@@ -1,3 +1,7 @@
+import type {
+  FoundationIndex,
+  TableauIndex,
+} from "@caheinz2/solitaire-core";
 import type { BoardCursor } from "./cursor.js";
 import type { BoardView } from "./render-board.js";
 
@@ -5,17 +9,27 @@ export type Command = "enter" | "escape";
 
 export type GameLike = {
   draw(): unknown;
-  moveWasteToTableau(tableauIndex: number): unknown;
-  moveWasteToFoundation(foundationIndex: number): unknown;
-  moveTableauToTableau(from: number, to: number, count: number): unknown;
-  moveTableauToFoundation(tableauIndex: number, foundationIndex: number): unknown;
-  moveFoundationToTableau(foundationIndex: number, tableauIndex: number): unknown;
+  moveWasteToTableau(tableauIndex: TableauIndex): unknown;
+  moveWasteToFoundation(foundationIndex: FoundationIndex): unknown;
+  moveTableauToTableau(
+    from: TableauIndex,
+    to: TableauIndex,
+    count: number,
+  ): unknown;
+  moveTableauToFoundation(
+    tableauIndex: TableauIndex,
+    foundationIndex: FoundationIndex,
+  ): unknown;
+  moveFoundationToTableau(
+    foundationIndex: FoundationIndex,
+    tableauIndex: TableauIndex,
+  ): unknown;
 };
 
 export type Selection =
   | Readonly<{ kind: "waste" }>
-  | Readonly<{ kind: "foundation"; foundationIndex: number }>
-  | Readonly<{ kind: "tableau"; tableauIndex: number; count: number }>;
+  | Readonly<{ kind: "foundation"; foundationIndex: FoundationIndex }>
+  | Readonly<{ kind: "tableau"; tableauIndex: TableauIndex; count: number }>;
 
 export type AppState = Readonly<{
   cursor: BoardCursor;
