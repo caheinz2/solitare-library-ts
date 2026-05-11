@@ -15,7 +15,10 @@ import { moveTableauCardToFoundation } from "./moves/move-tableau-to-foundation.
 import { moveTableauCardsToTableau } from "./moves/move-tableau-to-tableau.js";
 import { moveWasteCardToFoundation } from "./moves/move-waste-to-foundation.js";
 import { moveWasteCardToTableau } from "./moves/move-waste-to-tableau.js";
-import { copyFoundation } from "./utils/foundation-ops.js";
+import {
+  areFoundationsComplete,
+  copyFoundation,
+} from "./utils/foundation-ops.js";
 import { copyStack } from "./utils/stack-ops.js";
 
 export type CreateGameOptions = Readonly<{
@@ -70,6 +73,10 @@ export class Game {
       copyStack(sixth),
       copyStack(seventh),
     ];
+  }
+
+  public get isWon(): boolean {
+    return areFoundationsComplete(this.gameState.foundations);
   }
 
   public debugString(): string {

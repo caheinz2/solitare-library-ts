@@ -56,3 +56,6 @@ export const createEmptyFoundations = (): Foundations => [
   { suit: null, cards: [] },
   { suit: null, cards: [] },
 ];
+
+export const areFoundationsComplete = (foundations: Foundations): boolean =>
+  foundations.every((foundation) => foundation.cards.length === 13);

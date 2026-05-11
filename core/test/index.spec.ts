@@ -59,6 +59,14 @@ describe("Game.create", () => {
   });
 });
 
+describe("Game win state", () => {
+  it("is not won when a new game starts", () => {
+    const game = Game.create({ rng: () => 0.5 });
+
+    expect(game.isWon).toBe(false);
+  });
+});
+
 describe("Game immutability", () => {
   it("returns defensive copies from stock and tableau getters", () => {
     const game = Game.create({ rng: () => 0.5 });
